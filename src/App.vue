@@ -1,4 +1,5 @@
 <template>
+	<pre>{{ supabaseData.currentUser }}</pre>
 	<Button
 		v-if="supabaseData.currentUser"
 		:button="{
