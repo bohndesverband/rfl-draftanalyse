@@ -5,12 +5,43 @@
 		<Filter />
 		<hr />
 
-		<!-- <pre>{{ otherAnalysis }}</pre> -->
+		<!-- <pre>{{ supabaseData.currentFile }}</pre> -->
 
 		<div
 			class="uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-expand@m"
 			data-uk-grid
 		>
+			<div v-if="supabaseData.filteredPick" class="uk-width-1-1 column-upload">
+				<div
+					v-if="showUploadForm || !supabaseData.currentFile"
+					class="js-upload uk-placeholder uk-text-center"
+				>
+					<Form
+						:fields="{
+							file: {
+								type: 'file',
+								value: '',
+								required: true,
+							},
+							submit: {
+								label: 'Hochladen',
+								type: 'submit',
+							},
+						}"
+						@submit="uploadFile"
+					/>
+				</div>
+
+				<div v-if="supabaseData.currentFile" class="uk-position-relative">
+					<i
+						class="uk-icon-button uk-position-top-right uk-position-small uk-background-primary"
+						data-uk-icon="pencil"
+						@click="toggleUploadForm()"
+					></i>
+					<img :src="supabaseData.currentFile" class="uk-width-1-1" />
+				</div>
+			</div>
+
 			<div v-if="supabaseData.showEditCard" class="uk-width-1-1 uk-width-1-2@m">
 				<div class="uk-card uk-card-default uk-card-body">
 					<EditForm :data="supabaseData.currentAnalysis" />
@@ -71,8 +102,10 @@
 import Filter from "@/components/organisms/forms/Filter.vue";
 import Card from "@/components/organisms/Card.vue";
 import EditForm from "@/components/organisms/forms/EditForm.vue";
+import Form from "@/components/molecules/Form.vue";
+
 import { useSupabaseStore } from "@/store/supabase";
-import { ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 
 //
 // Constants
@@ -82,6 +115,7 @@ import { ref, watch } from "vue";
 const supabaseData = useSupabaseStore();
 const ownAnalysis = ref([]);
 const otherAnalysis = ref([]);
+const showUploadForm = ref(false);
 
 //
 // Functions
@@ -138,6 +172,14 @@ const showAddColumn = () => {
 
 	return false;
 };
+
+const uploadFile = (formData) => {
+	supabaseData.uploadFile(formData.fields.file);
+};
+
+const toggleUploadForm = () => {
+	showUploadForm.value = true;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -157,10 +199,18 @@ const showAddColumn = () => {
 	background-color: #f8f8f8;
 	transition: background-color 0.3s;
 	cursor: pointer;
-	min-height: 300px;
+	min-height: 150px;
+
+	@media sreen and (min-width: 1200px) {
+		min-height: 300px;
+	}
 
 	&:hover {
 		background-color: #e8e8e8;
 	}
+}
+
+.uk-icon-button {
+	cursor: pointer;
 }
 </style>

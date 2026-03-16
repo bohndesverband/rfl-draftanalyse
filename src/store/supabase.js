@@ -15,6 +15,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			filteredPick: "",
 			alertMessage: null,
 			alertType: null,
+			currentFile: null,
 		};
 	},
 	actions: {
@@ -134,6 +135,77 @@ export const useSupabaseStore = defineStore("supabaseData", {
 					.upsert(importData, { onConflict: "id" });
 
 				if (error) throw error;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
+		// Files
+		// ========================================================================
+
+		async uploadFile(file) {
+			if (!file) {
+				this.alertType = "error";
+				this.alertMessage = "Bitte waehle eine Datei aus.";
+				return;
+			}
+
+			try {
+				const { data, error } = await supabase.storage
+					.from("Screenshots")
+					.upload(file.value.name, file.value, { upsert: true });
+
+				if (error) throw error;
+
+				this.upsertFileInfo({
+					name: file.value.name,
+					draft_class: this.filteredDraftClass,
+					team_id: this.filteredTeam,
+					pick: this.filteredPick,
+				});
+				s;
+			} catch (error) {
+				console.log(error);
+
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
+		async upsertFileInfo(importData) {
+			try {
+				const { data, error } = await supabase
+					.from("Bilder")
+					.upsert(importData, { onConflict: "id" });
+
+				if (error) throw error;
+
+				this.fetchFile();
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
+		async fetchFile() {
+			try {
+				const { data, error } = await supabase
+					.from("Bilder")
+					.select("name")
+					.eq("draft_class", this.filteredDraftClass)
+					.eq("team_id", this.filteredTeam)
+					.eq("pick", this.filteredPick);
+
+				if (error) throw error;
+
+				try {
+					this.currentFile = supabase.storage
+						.from("Screenshots")
+						.getPublicUrl(data[0]?.name).data.publicUrl;
+				} catch (error) {
+					this.currentFile = null;
+				}
 			} catch (error) {
 				this.alertType = "error";
 				this.alertMessage = error.message;
