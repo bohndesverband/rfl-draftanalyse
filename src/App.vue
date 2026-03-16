@@ -11,7 +11,7 @@
 
 	<SignIn v-if="!supabaseData.currentUser" />
 
-	<router-view></router-view>
+	<Edit />
 
 	<Alert
 		v-if="supabaseData.alertMessage"
@@ -29,6 +29,7 @@
 
 import Button from "@/components/atoms/Button.vue";
 import SignIn from "@/components/organisms/SignIn.vue";
+import Edit from "@/components/organisms/Edit.vue";
 import Alert from "@/components/atoms/Alert.vue";
 
 import { onMounted } from "vue";

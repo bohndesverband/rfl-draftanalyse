@@ -131,11 +131,9 @@ watch(
 );
 
 const submitForm = async () => {
-	console.log(event.submitter.id);
+	// console.log(event.submitter.id);
 
 	if (event.submitter.id === "reset") {
-		console.log("reset");
-
 		emit("reset");
 		return;
 	}
