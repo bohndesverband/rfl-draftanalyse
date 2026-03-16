@@ -52,14 +52,11 @@ const formErrorMessage = ref("");
 // ========================================================================
 
 const submitForm = async (formData) => {
-	console.log("🚀 ~ submitForm ~ formData:", formData);
-
 	try {
 		const { data, error } = await supabase.auth.signInWithPassword({
 			email: formData.fields.email.value,
 			password: formData.fields.password.value,
 		});
-		console.log("🚀 ~ submitForm ~ data:", data);
 
 		if (error) throw error;
 

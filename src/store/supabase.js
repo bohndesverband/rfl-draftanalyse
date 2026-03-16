@@ -13,6 +13,8 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			filteredDraftClass: "",
 			filteredTeam: "",
 			filteredPick: "",
+			alertMessage: null,
+			alertType: null,
 		};
 	},
 	actions: {
@@ -20,97 +22,107 @@ export const useSupabaseStore = defineStore("supabaseData", {
 		// ========================================================================
 
 		async getSession() {
-			const {
-				data: { session },
-				error,
-			} = await supabase.auth.getSession();
-			if (error) {
-				console.error(error);
-				return null;
-			}
+			try {
+				const {
+					data: { session },
+					error,
+				} = await supabase.auth.getSession();
 
-			this.currentUser = session?.user || null;
+				if (error) throw error;
+				this.currentUser = session?.user || null;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
 		},
 
 		// User
 		// ========================================================================
 
 		async getCurrentUser() {
-			const {
-				data: { user },
-				error,
-			} = await supabase.auth.getUser();
+			try {
+				const {
+					data: { user },
+					error,
+				} = await supabase.auth.getUser();
 
-			if (error) {
-				console.error(error);
-				return null;
+				if (error) throw error;
+				this.currentUser = user;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
 			}
-
-			this.currentUser = user;
 		},
 
 		async signOut() {
-			const { error } = await supabase.auth.signOut();
-			if (error) {
-				console.error(error);
+			try {
+				const { error } = await supabase.auth.signOut();
+				if (error) throw error;
+				this.currentUser = null;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
 			}
-
-			this.currentUser = null;
 		},
 
 		// RFL Teams
 		// ========================================================================
 
 		async fetchRflTeams() {
-			const { data, error } = await supabase.from("RFL Teams").select();
-
-			if (error) {
-				console.error(error);
-				return;
+			try {
+				const { data, error } = await supabase.from("RFL Teams").select();
+				if (error) throw error;
+				this.rflTeams = data;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
 			}
-
-			this.rflTeams = data;
 		},
 
 		// RFL Drafts
 		// ========================================================================
 
 		async fetchRflDrafts() {
-			const { data, error } = await supabase.from("RFL Drafts").select();
-
-			if (error) {
-				console.error(error);
-				return;
+			try {
+				const { data, error } = await supabase.from("RFL Drafts").select();
+				if (error) throw error;
+				this.rflDrafts = data;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
 			}
-
-			this.rflDrafts = data;
 		},
 
 		// Analysen
 		// ========================================================================
 
 		async readAnalysis(draftClass, team, pick) {
-			const { data, error } = await supabase
-				.from("Draftanalysen")
-				.select()
-				.eq("draft_class", draftClass)
-				.eq("team_id", team)
-				.eq("pick", pick);
+			try {
+				const { data, error } = await supabase
+					.from("Draftanalysen")
+					.select()
+					.eq("draft_class", draftClass)
+					.eq("team_id", team)
+					.eq("pick", pick);
 
-			if (error) {
-				console.error(error);
-				return;
+				if (error) throw error;
+				this.currentPlayerAnalysis = data;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
 			}
-
-			this.currentPlayerAnalysis = data;
 		},
 
 		async upsertAnalysis(importData) {
-			const { data, error } = await supabase
-				.from("Draftanalysen")
-				.upsert(importData, { onConflict: "id" });
-			if (error) {
-				console.error(error);
+			try {
+				const { data, error } = await supabase
+					.from("Draftanalysen")
+					.upsert(importData, { onConflict: "id" });
+
+				if (error) throw error;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
 			}
 		},
 

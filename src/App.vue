@@ -7,8 +7,17 @@
 		}"
 		@click="logout"
 	/>
+
 	<SignIn v-if="!supabaseData.currentUser" />
+
 	<router-view v-else></router-view>
+
+	<Alert
+		v-if="supabaseData.alertMessage"
+		class="uk-position-bottom-right uk-position-medium"
+		:message="supabaseData.alertMessage"
+		:type="supabaseData.alertType"
+	/>
 </template>
 
 <script setup>
@@ -19,6 +28,8 @@
 
 import Button from "@/components/atoms/Button.vue";
 import SignIn from "@/components/organisms/SignIn.vue";
+import Alert from "@/components/atoms/Alert.vue";
+
 import { onMounted } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 
