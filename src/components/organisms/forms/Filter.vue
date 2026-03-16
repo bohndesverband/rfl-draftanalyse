@@ -190,6 +190,8 @@ const updateData = async (formData) => {
 					}
 					return [];
 				});
+
+			await supabaseData.fetchFile();
 		}
 	}
 

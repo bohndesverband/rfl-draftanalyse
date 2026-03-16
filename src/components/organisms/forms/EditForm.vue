@@ -111,13 +111,6 @@ watch(
 
 const submitForm = async (formData) => {
 	if (formData.id === "submit") {
-		if (!formData.fields.year.value) {
-			// TODO: Show error message
-			console.log("Wähle jahr aus");
-
-			return;
-		}
-
 		await supabaseData
 			.upsertAnalysis({
 				id: supabaseData.currentAnalysis?.id || undefined,

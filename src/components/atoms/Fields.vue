@@ -49,15 +49,24 @@
 					field.data.type != 'select' &&
 					field.data.type != 'checkbox'
 				"
-				class="uk-input"
-				:value="fieldValue"
+				:class="field.data.type != 'file' ? 'uk-input' : ''"
+				:value="field.data.type != 'file' ? fieldValue : undefined"
 				:type="field.data.type"
 				:autocomplete="field.data.autocomplete"
 				:maxlength="field.data.maxlength"
 				:required="field.data.required"
 				:disabled="field.data.disabled ? field.data.disabled : false"
 				:id="field.key"
-				@input="updateValue($event.target.value)"
+				@input="
+					field.data.type != 'file'
+						? updateValue($event.target.value)
+						: undefined
+				"
+				@change="
+					field.data.type == 'file'
+						? updateValue($event.target.files?.[0] || null)
+						: undefined
+				"
 			/>
 		</div>
 	</slot>
@@ -115,7 +124,7 @@ const props = defineProps({
 		required: true,
 	},
 	modelValue: {
-		type: [String, Number, Boolean],
+		type: [String, Number, Boolean, Object],
 		default: undefined,
 	},
 });
