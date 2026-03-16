@@ -2,6 +2,14 @@
 	<div class="uk-container uk-padding">
 		<h1 class="uk-heading-primary">Draftanalyse bearbeiten</h1>
 
+		<div class="uk-margin-small-bottom">
+			<a
+				href="https://jakesch.shinyapps.io/rfl-tools/#section-draftklassen"
+				target="_blank"
+				>Draftklassen in RFL Tools ansehen</a
+			>
+		</div>
+
 		<Filter />
 		<hr />
 
