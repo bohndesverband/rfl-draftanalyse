@@ -1,5 +1,4 @@
 <template>
-	<pre>{{ supabaseData.currentUser }}</pre>
 	<Button
 		v-if="supabaseData.currentUser"
 		:button="{
@@ -11,7 +10,7 @@
 
 	<SignIn v-if="!supabaseData.currentUser" />
 
-	<Edit />
+	<Edit v-else />
 
 	<Alert
 		v-if="supabaseData.alertMessage"
