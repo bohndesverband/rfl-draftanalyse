@@ -11,7 +11,7 @@
 
 	<SignIn v-if="!supabaseData.currentUser" />
 
-	<router-view v-else></router-view>
+	<router-view></router-view>
 
 	<Alert
 		v-if="supabaseData.alertMessage"
