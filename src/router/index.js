@@ -14,6 +14,11 @@ const routes = [
 		name: "signup",
 		component: SignUp,
 	},
+	{
+		// 404
+		path: "/:pathMatch(.*)*",
+		redirect: "/",
+	},
 ];
 
 const router = createRouter({
