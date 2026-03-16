@@ -39,6 +39,20 @@ export const useSupabaseStore = defineStore("supabaseData", {
 		// User
 		// ========================================================================
 
+		async registerUser(email, password) {
+			try {
+				const { data, error } = await supabase.auth.signUp({
+					email: email,
+					password: password,
+				});
+
+				if (error) throw error;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
 		async getCurrentUser() {
 			try {
 				const {
@@ -125,47 +139,5 @@ export const useSupabaseStore = defineStore("supabaseData", {
 				this.alertMessage = error.message;
 			}
 		},
-
-		// async upsertUserLeagues(importData) {
-		// 	const { data, error } = await supabase
-		// 		.from("userLeagues")
-		// 		.upsert(importData, { onConflict: ["league_id"] })
-		// 		.select();
-		// 	if (error) {
-		// 		console.error(error);
-		// 	}
-		// },
-		// async deleteUserLeagues(leagues) {},
-		// User Teams
-		// ========================================================================
-		// async readUserTeams() {
-		// 	// fetch supabase data
-		// 	let { data: userTeams, error } = await supabase
-		// 		.from("userTeams")
-		// 		.select("team_id,team_data,roster_data");
-		// 	// set state
-		// 	this.userTeams = userTeams;
-		// },
-		// async upsertUserTeams(importData) {
-		// 	const { data, error } = await supabase
-		// 		.from("userTeams")
-		// 		.upsert(importData, { onConflict: ["team_id"] })
-		// 		.select();
-		// 	if (error) {
-		// 		console.error(error);
-		// 	}
-		// },
-		// User Rosters
-		// ========================================================================
-		// async writeUserRosters(importData) {
-		// 	const { data, error } = await supabase
-		// 		.from("userTeams")
-		// 		.update({roster_data: importData.roster_data, last_modified: new Date()})
-		// 		.eq("team_id", importData.team_id)
-		// 		.select();
-		// 	if (error) {
-		// 		console.error(error);
-		// 	}
-		// }
 	},
 });

@@ -1,16 +1,5 @@
 <template>
-	<Button
-		v-if="supabaseData.currentUser"
-		:button="{
-			class: 'uk-position-top-right uk-position-medium',
-			label: 'Logout',
-		}"
-		@click="logout"
-	/>
-
-	<SignIn v-if="!supabaseData.currentUser" />
-
-	<Edit v-else />
+	<router-view />
 
 	<Alert
 		v-if="supabaseData.alertMessage"
@@ -26,9 +15,6 @@
 //
 // ========================================================================
 
-import Button from "@/components/atoms/Button.vue";
-import SignIn from "@/components/organisms/SignIn.vue";
-import Edit from "@/components/organisms/Edit.vue";
 import Alert from "@/components/atoms/Alert.vue";
 
 import { onMounted } from "vue";
@@ -51,8 +37,4 @@ onMounted(async () => {
 	await supabaseData.fetchRflTeams();
 	await supabaseData.fetchRflDrafts();
 });
-
-const logout = async () => {
-	await supabaseData.signOut();
-};
 </script>

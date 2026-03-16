@@ -23,6 +23,13 @@ import { useSupabaseStore } from "@/store/supabase";
 //
 // ========================================================================
 
+const props = defineProps({
+	type: {
+		type: String,
+		default: "Login",
+	},
+});
+
 const formFields = reactive({
 	email: {
 		label: "E-Mail",
@@ -37,7 +44,7 @@ const formFields = reactive({
 		required: true,
 	},
 	submit: {
-		label: "Login",
+		label: props.type,
 		type: "submit",
 		class: "uk-button-primary",
 	},
@@ -53,14 +60,21 @@ const formErrorMessage = ref("");
 
 const submitForm = async (formData) => {
 	try {
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email: formData.fields.email.value,
-			password: formData.fields.password.value,
-		});
+		if (props.type === "Registrieren") {
+			await supabaseData.registerUser(
+				formData.fields.email.value,
+				formData.fields.password.value,
+			);
+		} else {
+			const { data, error } = await supabase.auth.signInWithPassword({
+				email: formData.fields.email.value,
+				password: formData.fields.password.value,
+			});
 
-		if (error) throw error;
+			if (error) throw error;
 
-		await supabaseData.getSession();
+			await supabaseData.getSession();
+		}
 	} catch (error) {
 		formErrorMessage.value = error.message;
 		return;
