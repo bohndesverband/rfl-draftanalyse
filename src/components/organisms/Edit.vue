@@ -11,34 +11,20 @@
 		</div>
 
 		<Filter />
-		<hr />
 
-		<!-- <pre>{{ supabaseData.currentFile }}</pre> -->
+		<hr />
 
 		<div
 			class="uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-expand@m"
 			data-uk-grid
 		>
-			<div v-if="supabaseData.filteredPick" class="uk-width-1-1 column-upload">
-				<div
-					v-if="showUploadForm || !supabaseData.currentFile"
-					class="js-upload uk-placeholder uk-text-center"
-				>
-					<Form
-						:fields="{
-							file: {
-								type: 'file',
-								value: '',
-								required: true,
-							},
-							submit: {
-								label: 'Hochladen',
-								type: 'submit',
-							},
-						}"
-						@submit="uploadFile"
-					/>
-				</div>
+			<div
+				v-if="
+					supabaseData.filteredPick && supabaseData.filteredPick != 'trades'
+				"
+				class="uk-width-1-1 column-upload"
+			>
+				<UploadForm v-if="showUploadForm || !supabaseData.currentFile" />
 
 				<div v-if="supabaseData.currentFile" class="uk-position-relative">
 					<i
@@ -64,6 +50,7 @@
 					<Card
 						:card="{
 							title: analysisTitle(analysis.year),
+							image: analysis.pick.includes('trade') ? analysis.pick : null,
 							meta: analysis.last_update,
 							text: analysis.text,
 							footer: `Note: ${analysis.grade}`,
@@ -110,10 +97,10 @@
 import Filter from "@/components/organisms/forms/Filter.vue";
 import Card from "@/components/organisms/Card.vue";
 import EditForm from "@/components/organisms/forms/EditForm.vue";
-import Form from "@/components/molecules/Form.vue";
+import UploadForm from "@/components/organisms/forms/UploadForm.vue";
 
 import { useSupabaseStore } from "@/store/supabase";
-import { reactive, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 //
 // Constants
@@ -179,10 +166,6 @@ const showAddColumn = () => {
 	}
 
 	return false;
-};
-
-const uploadFile = (formData) => {
-	supabaseData.uploadFile(formData.fields.file);
 };
 
 const toggleUploadForm = () => {

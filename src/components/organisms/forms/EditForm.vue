@@ -1,8 +1,5 @@
 <template>
-	<!-- <pre>{{ supabaseData.filteredDraftClass }}</pre>
-	<pre>{{ supabaseData.filteredTeam }}</pre>
-	<pre>{{ supabaseData.filteredPick }}</pre> -->
-	<!-- <pre>{{ availablePicks.value }}</pre>s -->
+	<UploadForm v-if="supabaseData.filteredPick == 'trades'" />
 	<Form :fields="formFields" @submit="submitForm" @reset="cancelForm" />
 </template>
 
@@ -15,6 +12,7 @@
 import Form from "@/components/molecules/Form.vue";
 import { reactive, ref, watch } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
+import UploadForm from "@/components/organisms/forms/UploadForm.vue";
 
 //
 // Constants
@@ -111,12 +109,23 @@ watch(
 
 const submitForm = async (formData) => {
 	if (formData.id === "submit") {
+		let pick = supabaseData.filteredPick;
+
+		if (supabaseData.filteredPick == "trades") {
+			if (supabaseData.currentAnalysis.pick) {
+				pick = supabaseData.currentAnalysis.pick;
+			} else {
+				const now = new Date().valueOf();
+				pick = `trade_${now}`;
+			}
+		}
+
 		await supabaseData
 			.upsertAnalysis({
 				id: supabaseData.currentAnalysis?.id || undefined,
 				draft_class: supabaseData.filteredDraftClass,
 				team_id: supabaseData.filteredTeam,
-				pick: supabaseData.filteredPick,
+				pick: pick,
 				year: formData.fields.year.value,
 				text: formData.fields.text.value,
 				grade: formData.fields.grade.value,
@@ -127,7 +136,7 @@ const submitForm = async (formData) => {
 				supabaseData.readAnalysis(
 					supabaseData.filteredDraftClass,
 					supabaseData.filteredTeam,
-					supabaseData.filteredPick,
+					pick,
 				);
 				supabaseData.currentAnalysis = null;
 				supabaseData.showEditCard = false;

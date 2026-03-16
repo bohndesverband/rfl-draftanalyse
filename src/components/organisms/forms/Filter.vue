@@ -131,6 +131,9 @@ const updateData = async (formData) => {
 	}
 
 	for (const [fieldKey, field] of changedFieldEntries) {
+		supabaseData.currentAnalysis = null;
+		supabaseData.currentFile = null;
+
 		// wenn draftklasse oder team geändert wurde, müssen die verfügbaren picks neu berechnet werden
 		if (fieldKey === "draftClass" || fieldKey === "team") {
 			supabaseData.filteredDraftClass = selectedDraftClass;
@@ -161,8 +164,8 @@ const updateData = async (formData) => {
 					value: "laterounds",
 				},
 				{
-					text: "Trade",
-					value: "trade",
+					text: "Trades",
+					value: "trades",
 				},
 				{
 					text: "gesamte Draftklasse",

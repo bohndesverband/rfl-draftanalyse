@@ -1,6 +1,6 @@
 <template>
 	<div class="uk-card uk-card-default">
-		<div class="uk-card-header">
+		<div class="uk-card-header uk-padding-small">
 			<div class="uk-grid-small uk-flex-middle" data-uk-grid>
 				<div class="uk-width-expand">
 					<h3 class="uk-card-title uk-margin-remove-bottom">
@@ -19,9 +19,18 @@
 				</div>
 			</div>
 		</div>
-		<div class="uk-card-body" v-html="markdown.render(card.text)"></div>
+		<div class="uk-card-body uk-padding-small">
+			<div
+				v-if="supabaseData.filteredPick === 'trades'"
+				class="uk-margin-small-bottom"
+			>
+				<Image :image="{ pick: card.image }" />
+			</div>
 
-		<div class="uk-card-footer">{{ card.footer }}</div>
+			<div v-html="markdown.render(card.text)"></div>
+		</div>
+
+		<div class="uk-card-footer uk-padding-small">{{ card.footer }}</div>
 	</div>
 </template>
 
@@ -31,7 +40,9 @@
 //
 // ========================================================================
 
+import Image from "@/components/atoms/Image.vue";
 import MarkdownIt from "markdown-it";
+import { useSupabaseStore } from "@/store/supabase";
 
 //
 // Constants
@@ -45,14 +56,13 @@ const props = defineProps({
 	},
 });
 
+const supabaseData = useSupabaseStore();
 const markdown = new MarkdownIt();
 const emit = defineEmits(["edit"]);
-
-//
-// Functions
-//
-// ========================================================================
-const startEdit = () => {};
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+ul {
+	margin-bottom: 0;
+}
+</style>

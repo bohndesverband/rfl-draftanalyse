@@ -118,7 +118,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 					.select()
 					.eq("draft_class", draftClass)
 					.eq("team_id", team)
-					.eq("pick", pick);
+					.textSearch("pick", `'${pick}'`);
 
 				if (error) throw error;
 				this.currentPlayerAnalysis = data;
@@ -152,19 +152,27 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			}
 
 			try {
+				const fileExtension = file.value.name.split(".").pop();
+
+				const pick =
+					this.filteredPick == "trades"
+						? this.currentAnalysis.pick
+						: this.filteredPick;
+
+				const filename = `${this.filteredDraftClass}_${this.filteredTeam}_${pick}.${fileExtension}`;
+
 				const { data, error } = await supabase.storage
 					.from("Screenshots")
-					.upload(file.value.name, file.value, { upsert: true });
+					.upload(filename, file.value, { upsert: true });
 
 				if (error) throw error;
 
 				this.upsertFileInfo({
-					name: file.value.name,
+					name: filename,
 					draft_class: this.filteredDraftClass,
 					team_id: this.filteredTeam,
-					pick: this.filteredPick,
+					pick: pick,
 				});
-				s;
 			} catch (error) {
 				console.log(error);
 
@@ -188,24 +196,39 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			}
 		},
 
-		async fetchFile() {
+		async fetchFile(pick) {
+			if (!pick) pick = this.filteredPick;
+
 			try {
 				const { data, error } = await supabase
 					.from("Bilder")
 					.select("name")
 					.eq("draft_class", this.filteredDraftClass)
 					.eq("team_id", this.filteredTeam)
-					.eq("pick", this.filteredPick);
+					.eq("pick", pick);
 
 				if (error) throw error;
 
-				try {
-					this.currentFile = supabase.storage
-						.from("Screenshots")
-						.getPublicUrl(data[0]?.name).data.publicUrl;
-				} catch (error) {
+				const url = this.getImgUrl(data[0]?.name);
+
+				if (this.filteredPick != "trades") {
+					this.currentFile = url;
+				} else {
 					this.currentFile = null;
+					return url;
 				}
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
+		getImgUrl(name) {
+			try {
+				if (!name) return null;
+
+				return supabase.storage.from("Screenshots").getPublicUrl(name)?.data
+					?.publicUrl;
 			} catch (error) {
 				this.alertType = "error";
 				this.alertMessage = error.message;
