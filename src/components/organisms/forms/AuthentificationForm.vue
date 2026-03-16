@@ -79,6 +79,8 @@ const submitForm = async (formData) => {
 			if (error) throw error;
 
 			await supabaseData.getSession();
+			await supabaseData.fetchRflTeams();
+			await supabaseData.fetchRflDrafts();
 		}
 	} catch (error) {
 		formErrorMessage.value = error.message;

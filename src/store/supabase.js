@@ -73,7 +73,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			try {
 				const { error } = await supabase.auth.signOut();
 				if (error) throw error;
-				this.currentUser = null;
+				this.resetStore();
 			} catch (error) {
 				this.alertType = "error";
 				this.alertMessage = error.message;
@@ -174,8 +174,6 @@ export const useSupabaseStore = defineStore("supabaseData", {
 					pick: pick,
 				});
 			} catch (error) {
-				console.log(error);
-
 				this.alertType = "error";
 				this.alertMessage = error.message;
 			}
@@ -233,6 +231,24 @@ export const useSupabaseStore = defineStore("supabaseData", {
 				this.alertType = "error";
 				this.alertMessage = error.message;
 			}
+		},
+
+		// Cleanup
+		// ========================================================================
+
+		resetStore() {
+			this.currentUser = null;
+			this.rflTeams = [];
+			this.rflDrafts = [];
+			this.currentPlayerAnalysis = [];
+			this.currentAnalysis = [];
+			this.showEditCard = false;
+			this.filteredDraftClass = "";
+			this.filteredTeam = "";
+			this.filteredPick = "";
+			this.alertMessage = null;
+			this.alertType = null;
+			this.currentFile = null;
 		},
 	},
 });

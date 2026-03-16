@@ -223,5 +223,6 @@ const toggleUploadForm = () => {
 
 .uk-button-group {
 	gap: 2px;
+	flex-wrap: wrap;
 }
 </style>
