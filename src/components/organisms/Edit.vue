@@ -3,11 +3,24 @@
 		<h1 class="uk-heading-primary">Draftanalyse bearbeiten</h1>
 
 		<div class="uk-margin-small-bottom">
-			<a
-				href="https://jakesch.shinyapps.io/rfl-tools/#section-draftklassen"
-				target="_blank"
-				>Draftklassen in RFL Tools ansehen</a
-			>
+			<div class="uk-text-meta uk-text-uppercase uk-margin-small-bottom">
+				RFL Tools
+			</div>
+
+			<div class="uk-button-group">
+				<a
+					class="uk-button uk-button-secondary"
+					href="https://jakesch.shinyapps.io/rfl-tools/#section-draftklassen"
+					target="_blank"
+					>Draftklassen</a
+				>
+				<a
+					class="uk-button uk-button-secondary"
+					href="https://jakesch.shinyapps.io/rfl-tools/#section-draftboards"
+					target="_blank"
+					>Draftboards</a
+				>
+			</div>
 		</div>
 
 		<Filter />
@@ -69,7 +82,10 @@
 			</div>
 		</div>
 
-		<div class="uk-background-muted uk-padding uk-margin-large-top">
+		<div
+			v-if="otherAnalysis.length > 0"
+			class="uk-background-muted uk-padding uk-margin-large-top"
+		>
 			<h2>Einschätzungen von Anderen</h2>
 
 			<Card
@@ -203,5 +219,9 @@ const toggleUploadForm = () => {
 
 .uk-icon-button {
 	cursor: pointer;
+}
+
+.uk-button-group {
+	gap: 2px;
 }
 </style>
