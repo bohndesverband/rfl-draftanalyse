@@ -1,6 +1,7 @@
 <template>
 	<Form
 		:fields="formFields"
+		:formSuccessMessage="formSuccessMessage"
 		:formErrorMessage="formErrorMessage"
 		@submit="submitForm"
 	/>
@@ -52,6 +53,7 @@ const formFields = reactive({
 
 const supabaseData = useSupabaseStore();
 const formErrorMessage = ref("");
+const formSuccessMessage = ref("");
 
 //
 // Functions
@@ -65,6 +67,9 @@ const submitForm = async (formData) => {
 				formData.fields.email.value,
 				formData.fields.password.value,
 			);
+
+			formSuccessMessage.value =
+				"Registrierung erfolgreich! Bitte überprüfe deine E-Mails, um dein Konto zu aktivieren.";
 		} else {
 			const { data, error } = await supabase.auth.signInWithPassword({
 				email: formData.fields.email.value,
