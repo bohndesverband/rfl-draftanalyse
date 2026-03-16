@@ -33,7 +33,7 @@
 					/>
 				</div>
 			</slot>
-			<div v-if="!supabaseData.showEditCard" class="uk-width-1-3@m column-add">
+			<div v-if="showAddColumn()" class="uk-width-1-3@m column-add">
 				<div
 					class="uk-card uk-card-muted uk-flex uk-flex-middle uk-flex-center"
 					@click="supabaseData.showEditCard = true"
@@ -124,6 +124,19 @@ const analysisTitle = (year) => {
 	}
 
 	return title;
+};
+
+const showAddColumn = () => {
+	if (
+		supabaseData.filteredDraftClass &&
+		supabaseData.filteredTeam &&
+		supabaseData.filteredPick &&
+		!supabaseData.showEditCard
+	) {
+		return true;
+	}
+
+	return false;
 };
 </script>
 

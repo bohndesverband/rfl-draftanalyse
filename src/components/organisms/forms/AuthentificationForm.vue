@@ -1,5 +1,9 @@
 <template>
-	<Form :fields="formFields" @submit="submitForm" />
+	<Form
+		:fields="formFields"
+		:formErrorMessage="formErrorMessage"
+		@submit="submitForm"
+	/>
 </template>
 
 <script setup>
@@ -12,7 +16,6 @@ import Form from "@/components/molecules/Form.vue";
 
 import { reactive, ref } from "vue";
 import { supabase } from "@/js/supabase";
-import { useRouter } from "vue-router";
 import { useSupabaseStore } from "@/store/supabase";
 
 //
@@ -40,8 +43,8 @@ const formFields = reactive({
 	},
 });
 
-const router = useRouter();
 const supabaseData = useSupabaseStore();
+const formErrorMessage = ref("");
 
 //
 // Functions
@@ -49,18 +52,22 @@ const supabaseData = useSupabaseStore();
 // ========================================================================
 
 const submitForm = async (formData) => {
-	const { error, data } = await supabase.auth.signInWithPassword({
-		email: formData.fields.email.value,
-		password: formData.fields.password.value,
-	});
+	console.log("🚀 ~ submitForm ~ formData:", formData);
 
-	if (error) {
-		console.error("Login error:", error);
+	try {
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email: formData.fields.email.value,
+			password: formData.fields.password.value,
+		});
+		console.log("🚀 ~ submitForm ~ data:", data);
+
+		if (error) throw error;
+
+		await supabaseData.getSession();
+	} catch (error) {
+		formErrorMessage.value = error.message;
 		return;
 	}
-
-	await supabaseData.getCurrentUser();
-	router.push("/edit");
 };
 </script>
 

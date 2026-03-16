@@ -1,16 +1,46 @@
 <template>
-	<router-view></router-view>
+	<Button
+		v-if="supabaseData.currentUser"
+		:button="{
+			class: 'uk-position-top-right uk-position-medium',
+			label: 'Logout',
+		}"
+		@click="logout"
+	/>
+	<SignIn v-if="!supabaseData.currentUser" />
+	<router-view v-else></router-view>
 </template>
 
 <script setup>
+//
+// Imports
+//
+// ========================================================================
+
+import Button from "@/components/atoms/Button.vue";
+import SignIn from "@/components/organisms/SignIn.vue";
 import { onMounted } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 
+//
+// Constants
+//
+// ========================================================================
+
 const supabaseData = useSupabaseStore();
 
+//
+// Functions
+//
+// ========================================================================
+
 onMounted(async () => {
-	await supabaseData.getCurrentUser();
+	await supabaseData.getSession();
 	await supabaseData.fetchRflTeams();
 	await supabaseData.fetchRflDrafts();
 });
+
+const logout = async () => {
+	await supabaseData.signOut();
+};
 </script>

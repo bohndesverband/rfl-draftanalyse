@@ -4,7 +4,7 @@ import { supabase } from "@/js/supabase.js";
 export const useSupabaseStore = defineStore("supabaseData", {
 	state: () => {
 		return {
-			currentUser: [],
+			currentUser: null,
 			rflTeams: [],
 			rflDrafts: [],
 			currentPlayerAnalysis: [],
@@ -16,6 +16,22 @@ export const useSupabaseStore = defineStore("supabaseData", {
 		};
 	},
 	actions: {
+		// Session
+		// ========================================================================
+
+		async getSession() {
+			const {
+				data: { session },
+				error,
+			} = await supabase.auth.getSession();
+			if (error) {
+				console.error(error);
+				return null;
+			}
+
+			this.currentUser = session?.user || null;
+		},
+
 		// User
 		// ========================================================================
 
@@ -31,6 +47,15 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			}
 
 			this.currentUser = user;
+		},
+
+		async signOut() {
+			const { error } = await supabase.auth.signOut();
+			if (error) {
+				console.error(error);
+			}
+
+			this.currentUser = null;
 		},
 
 		// RFL Teams

@@ -1,16 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import Edit from "@/views/Edit.vue";
-import SignIn from "@/views/SignIn.vue";
 
 const routes = [
 	{
 		path: "/",
-		name: "signIn",
-		component: SignIn,
-	},
-	{
-		path: "/edit",
 		name: "edit",
 		component: Edit,
 	},

@@ -12,7 +12,7 @@
 // ========================================================================
 
 import Form from "@/components/molecules/Form.vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 
 //
@@ -52,9 +52,6 @@ const formFields = reactive({
 				value: "",
 				disabled: true,
 			},
-			...Object.entries(supabaseData.rflTeams).map(([key, team]) => {
-				return { value: team.team_id, text: team.team_name };
-			}),
 		],
 	},
 	pick: {
@@ -62,6 +59,13 @@ const formFields = reactive({
 		type: "select",
 		value: "",
 		width: "uk-width-1-3@m",
+		options: [
+			{
+				text: "Bitte einen Pick wählen",
+				value: "",
+				disabled: true,
+			},
+		],
 	},
 });
 
@@ -71,6 +75,37 @@ const previousFieldValues = ref({});
 // Functions
 //
 // ========================================================================
+
+const buildTeamOptions = (teams) => {
+	if (!Array.isArray(teams)) {
+		return [
+			{
+				text: "Bitte ein Team wählen",
+				value: "",
+				disabled: true,
+			},
+		];
+	}
+
+	return [
+		{
+			text: "Bitte ein Team wählen",
+			value: "",
+			disabled: true,
+		},
+		...teams.map((team) => {
+			return { value: team.team_id, text: team.team_name };
+		}),
+	];
+};
+
+watch(
+	() => supabaseData.rflTeams,
+	(teams) => {
+		formFields.team.options = buildTeamOptions(teams);
+	},
+	{ immediate: true },
+);
 
 const updateData = async (formData) => {
 	supabaseData.showEditCard = false;
