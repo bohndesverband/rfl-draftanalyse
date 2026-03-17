@@ -1,6 +1,9 @@
 <template>
-	<UploadForm v-if="supabaseData.filteredPick == 'trades'" />
-	<Form :fields="formFields" @submit="submitForm" @reset="cancelForm" />
+	<div class="uk-background-default uk-padding-small">
+		<h3 class="uk-h4">Analyse bearbeiten</h3>
+		<UploadForm v-if="supabaseData.filteredPick == 'trades'" />
+		<Form :fields="formFields" @submit="submitForm" @reset="emit('reset')" />
+	</div>
 </template>
 
 <script setup>
@@ -10,7 +13,7 @@
 // ========================================================================
 
 import Form from "@/components/molecules/Form.vue";
-import { reactive, ref, watch } from "vue";
+import { reactive } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 import UploadForm from "@/components/organisms/forms/UploadForm.vue";
 
@@ -32,8 +35,7 @@ const formFields = reactive({
 	year: {
 		label: "Analyse Jahr",
 		type: "select",
-		value: "",
-		required: true,
+		value: props.data?.year || "",
 		options: [
 			{
 				text: "Bitte wählen",
@@ -61,22 +63,20 @@ const formFields = reactive({
 	text: {
 		label: "Analyse",
 		type: "textarea",
-		value: "",
-		required: true,
+		value: props.data?.text || "",
 		width: "uk-width-1-1",
-		rows: 15,
+		rows: 10,
 	},
 	grade: {
 		label: "Note",
 		type: "",
-		value: "",
+		value: props.data?.grade || "",
 	},
 	delete: {
 		label: "Löschen",
 		type: "submit",
 		width: "uk-width-1-2@s",
 		class: "uk-button-danger",
-		disabled: true,
 	},
 	submit: {
 		label: "Speichern",
@@ -84,47 +84,45 @@ const formFields = reactive({
 		width: "uk-width-1-2@s uk-flex uk-flex-right",
 		class: "uk-button-primary",
 	},
-	// reset: {
-	// 	label: "Abbrechen",
-	// 	type: "reset",
-	// 	width: "uk-width-1-1",
-	// 	class: "uk-button-muted uk-width-1-1",
-	// },
+	reset: {
+		label: "Abbrechen",
+		type: "submit",
+		width: "uk-width-1-1",
+		class: "uk-button-muted uk-width-1-1",
+	},
 });
+
+const emit = defineEmits(["submit", "reset"]);
 
 //
 // Functions
 //
 // ========================================================================
 
-watch(
-	() => supabaseData.currentAnalysis,
-	(analysis) => {
-		formFields.year.value = analysis?.year?.toString() || "";
-		formFields.text.value = analysis?.text || "";
-		formFields.grade.value = analysis?.grade || "";
-	},
-	{ deep: true, immediate: true },
-);
+// watch(
+// 	() => supabaseData.currentAnalysis,
+// 	(analysis) => {
+// 		formFields.year.value = analysis?.year?.toString() || "";
+// 		formFields.text.value = analysis?.text || "";
+// 		formFields.grade.value = analysis?.grade || "";
+// 	},
+// 	{ deep: true, immediate: true },
+// );
 
 const submitForm = async (formData) => {
 	if (formData.id === "submit") {
-		let pick = supabaseData.filteredPick;
+		let pick = props.data.pick;
 
-		if (supabaseData.filteredPick == "trades") {
-			if (supabaseData.currentAnalysis.pick) {
-				pick = supabaseData.currentAnalysis.pick;
-			} else {
-				const now = new Date().valueOf();
-				pick = `trade_${now}`;
-			}
+		if (props.data.pick == "trade") {
+			const now = new Date().valueOf();
+			pick = `trade_${now}`;
 		}
 
 		await supabaseData
 			.upsertAnalysis({
-				id: supabaseData.currentAnalysis?.id || undefined,
-				draft_class: supabaseData.filteredDraftClass,
-				team_id: supabaseData.filteredTeam,
+				id: props.data?.id || undefined,
+				draft_class: props.data.draft_class || supabaseData.filteredDraftClass,
+				team_id: props.data.team_id || supabaseData.filteredTeam,
 				pick: pick,
 				year: formData.fields.year.value,
 				text: formData.fields.text.value,
@@ -133,25 +131,22 @@ const submitForm = async (formData) => {
 				last_update: new Date().toISOString(),
 			})
 			.then(() => {
-				supabaseData.readAnalysis(
-					supabaseData.filteredDraftClass,
-					supabaseData.filteredTeam,
-					pick,
-				);
-				supabaseData.currentAnalysis = null;
-				supabaseData.showEditCard = false;
+				updateData();
 			});
+
+		emit("submit");
 	} else if (formData.id === "delete") {
-		// TODO: Löschen
-		console.log("Löschen");
+		supabaseData.deleteAnalysis(props.data.id).then(() => {
+			updateData();
+		});
 	}
 };
 
-const cancelForm = () => {
-	console.log("cancel");
-
-	supabaseData.currentAnalysis = null;
-	supabaseData.showEditCard = false;
+const updateData = () => {
+	supabaseData.fetchDraftClassAnalysis(
+		supabaseData.filteredDraftClass,
+		supabaseData.filteredTeam,
+	);
 };
 </script>
 
