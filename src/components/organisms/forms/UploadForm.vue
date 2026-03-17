@@ -23,6 +23,15 @@ import { ref } from "vue";
 //
 // ========================================================================
 
+const props = defineProps({
+	id: {
+		type: String,
+		required: true,
+	},
+});
+
+const emit = defineEmits(["uploaded"]);
+
 const supabaseData = useSupabaseStore();
 const formFields = {
 	file: {
@@ -43,9 +52,11 @@ const formSuccessMessage = ref("");
 //
 // ========================================================================
 
-const uploadFile = (formData) => {
-	supabaseData.uploadFile(formData.fields.file);
+const uploadFile = async (formData) => {
+	supabaseData.uploadFile(formData.fields.file, props.id);
+
 	formSuccessMessage.value = "Datei erfolgreich hochgeladen.";
+	emit("uploaded", { filename: props.id });
 };
 </script>
 

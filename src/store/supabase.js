@@ -7,15 +7,12 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			currentUser: null,
 			rflTeams: [],
 			rflDrafts: [],
-			currentPlayerAnalysis: [],
-			currentAnalysis: [],
-			showEditCard: false,
+			selectedDraftClass: [],
 			filteredDraftClass: "",
 			filteredTeam: "",
 			filteredPick: "",
 			alertMessage: null,
 			alertType: null,
-			currentFile: null,
 		};
 	},
 	actions: {
@@ -111,6 +108,25 @@ export const useSupabaseStore = defineStore("supabaseData", {
 		// Analysen
 		// ========================================================================
 
+		async fetchDraftClassAnalysis(draftClass, team) {
+			try {
+				const { data, error } = await supabase
+					.from("Draftanalysen")
+					.select()
+					.eq("draft_class", draftClass)
+					.eq("team_id", team);
+
+				if (error) throw error;
+
+				this.selectedDraftClass = data;
+			} catch (error) {
+				console.log(error);
+
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
 		async readAnalysis(draftClass, team, pick) {
 			try {
 				const { data, error } = await supabase
@@ -141,10 +157,24 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			}
 		},
 
+		async deleteAnalysis(id) {
+			try {
+				const { data, error } = await supabase
+					.from("Draftanalysen")
+					.delete()
+					.eq("id", id);
+
+				if (error) throw error;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
 		// Files
 		// ========================================================================
 
-		async uploadFile(file) {
+		async uploadFile(file, id) {
 			if (!file) {
 				this.alertType = "error";
 				this.alertMessage = "Bitte waehle eine Datei aus.";
@@ -154,12 +184,12 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			try {
 				const fileExtension = file.value.name.split(".").pop();
 
-				const pick =
-					this.filteredPick == "trades"
-						? this.currentAnalysis.pick
-						: this.filteredPick;
+				// const pick =
+				// 	this.filteredPick == "trades"
+				// 		? this.currentAnalysis.pick
+				// 		: this.filteredPick;
 
-				const filename = `${this.filteredDraftClass}_${this.filteredTeam}_${pick}.${fileExtension}`;
+				const filename = `${this.filteredDraftClass}_${this.filteredTeam}_${id}.${fileExtension}`;
 
 				const { data, error } = await supabase.storage
 					.from("Screenshots")
@@ -171,7 +201,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 					name: filename,
 					draft_class: this.filteredDraftClass,
 					team_id: this.filteredTeam,
-					pick: pick,
+					pick: id,
 				});
 			} catch (error) {
 				this.alertType = "error";
@@ -195,8 +225,6 @@ export const useSupabaseStore = defineStore("supabaseData", {
 		},
 
 		async fetchFile(pick) {
-			if (!pick) pick = this.filteredPick;
-
 			try {
 				const { data, error } = await supabase
 					.from("Bilder")
@@ -209,12 +237,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 
 				const url = this.getImgUrl(data[0]?.name);
 
-				if (this.filteredPick != "trades") {
-					this.currentFile = url;
-				} else {
-					this.currentFile = null;
-					return url;
-				}
+				return url;
 			} catch (error) {
 				this.alertType = "error";
 				this.alertMessage = error.message;
