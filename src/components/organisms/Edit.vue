@@ -31,35 +31,27 @@
 
 		<hr />
 
-		<div v-if="draftPicks && draftPicks.length > 0" data-uk-grid>
-			<div class="uk-width-4-5@m">
-				<div class="uk-padding-small uk-background-muted">
-					<h2>Eigene Einschätzungen</h2>
+		<div v-if="draftPicks && draftPicks.length > 0">
+			<div class="uk-padding-small uk-background-muted">
+				<h2>Draftanalyse</h2>
 
-					<!-- nur picks der ersten drei runden -->
-					<Analysen
-						v-for="draftPick in draftPicks.filter(
-							(draftpick) => draftpick.round <= 3,
-						)"
-						:key="draftPick.id"
-						:title="draftPick.title"
-						:draftPick="draftPick"
-						type="own"
-					/>
+				<!-- nur picks der ersten drei runden -->
+				<Analysen
+					v-for="draftPick in draftPicks.filter(
+						(draftpick) => draftpick.round <= 3,
+					)"
+					:key="draftPick.id"
+					:title="draftPick.title"
+					:draftPick="draftPick"
+				/>
 
-					<Analysen
-						title="Late Round Picks"
-						:draftPick="{ pick: 'laterounds' }"
-						:players="draftPicks.filter((draftpick) => draftpick.round >= 4)"
-						type="own"
-					/>
-					<Analysen title="Trades" :draftPick="{ pick: 'trade' }" type="own" />
-					<Analysen
-						title="Draftklasse"
-						:draftPick="{ pick: 'klasse' }"
-						type="own"
-					/>
-				</div>
+				<Analysen
+					title="Late Round Picks"
+					:draftPick="{ pick: 'laterounds' }"
+					:players="draftPicks.filter((draftpick) => draftpick.round >= 4)"
+				/>
+				<Analysen title="Trades" :draftPick="{ pick: 'trade' }" />
+				<Analysen title="Draftklasse" :draftPick="{ pick: 'klasse' }" />
 			</div>
 		</div>
 

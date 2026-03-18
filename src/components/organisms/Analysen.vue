@@ -1,40 +1,78 @@
 <template>
 	<!-- <pre>{{ supabaseData.selectedDraftClass }}</pre> -->
 	<div class="draftpick uk-position-relative">
-		<h3 class="uk-h4 uk-margin-remove-top">{{ title }}</h3>
+		<div data-uk-grid>
+			<div class="uk-width-2-3@m uk-position-relative">
+				<div class="uk-position-top-right uk-button-group">
+					<button
+						v-if="!showEditForm"
+						class="uk-button uk-button-secondary"
+						@click="showEditForm = true"
+					>
+						<i data-uk-icon="icon: plus"></i>
+					</button>
+					<button
+						v-if="!image"
+						class="uk-button uk-button-primary"
+						@click="showUploadForm = !showUploadForm"
+					>
+						<i data-uk-icon="icon: image"></i>
+					</button>
+				</div>
 
-		<ul v-if="players" class="uk-list uk-list-divider uk-column-1-2">
-			<li v-for="player in players" :key="player.id">
-				{{ player.title }}
-			</li>
-		</ul>
+				<h3 class="uk-h4 uk-margin-remove-top">{{ title }}</h3>
 
-		<!-- filter die eigenen analysen nach den draftpicks -->
-		<!-- sortiere analysen nach jahr -->
-		<ul class="uk-list uk-list-striped">
-			<Analyse
-				v-for="analysis in analyses"
-				:key="analysis.id"
-				:data="analysis"
-			/>
-		</ul>
+				<ul v-if="players" class="uk-list uk-list-divider uk-column-1-2">
+					<li v-for="player in players" :key="player.id">
+						{{ player.title }}
+					</li>
+				</ul>
 
-		<!-- {{ draftPick }} -->
-		<ImageUpload :image="image" :draftPick="draftPick" @uploaded="loadImage" />
-		<EditForm
-			v-if="showEditForm"
-			:data="editData"
-			@reset="showEditForm = false"
-			@submit="showEditForm = false"
-		/>
+				<ImageUpload
+					v-if="showUploadForm || image"
+					:image="image"
+					:draftPick="draftPick"
+					@uploaded="loadImage"
+				/>
 
-		<button
-			v-else
-			class="uk-button uk-button-muted uk-width-1-1 uk-padding-small"
-			@click="showEditForm = true"
-		>
-			<i data-uk-icon="icon: plus; ratio: 2"></i>
-		</button>
+				<EditForm
+					v-if="showEditForm"
+					:data="editData"
+					@reset="showEditForm = false"
+					@submit="showEditForm = false"
+				/>
+
+				<!-- filter die eigenen analysen nach den draftpicks -->
+				<!-- sortiere analysen nach jahr -->
+				<ul class="uk-list uk-list-striped">
+					<Analyse
+						v-for="analysis in ownAnalyses"
+						:key="analysis.id"
+						:data="analysis"
+					/>
+				</ul>
+			</div>
+
+			<div class="uk-width-1-3@m">
+				<ul class="uk-accordion-default" data-uk-accordion>
+					<li>
+						<a class="uk-accordion-title" href
+							>+ Zeige Einschätzung von anderen</a
+						>
+						<div class="uk-accordion-content">
+							<ul class="uk-list uk-list-striped">
+								<Analyse
+									v-for="analysis in otherAnalyses"
+									:key="analysis.id"
+									:data="analysis"
+									:showEditButton="false"
+								/>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -65,9 +103,6 @@ const props = defineProps({
 		type: Object,
 		required: true,
 	},
-	type: {
-		type: String,
-	},
 	players: {
 		type: Array,
 	},
@@ -75,8 +110,13 @@ const props = defineProps({
 
 const supabaseData = useSupabaseStore();
 const analyses = ref([]);
+
+const ownAnalyses = ref([]);
+const otherAnalyses = ref([]);
+
 const image = ref("");
 const showEditForm = ref(false);
+const showUploadForm = ref(false);
 const editData = ref();
 
 //
@@ -100,23 +140,19 @@ watch(
 			supabaseData.selectedDraftClass &&
 			supabaseData.selectedDraftClass.length > 0
 		) {
-			let filteredAnalyses;
+			// filtere draftklasse nach eigenen einträgen
+			let tmpAnalyses = supabaseData.selectedDraftClass.filter(
+				(entry) => entry.user_id == supabaseData.currentUser.id,
+			);
 
-			if (props.type === "own") {
-				// filtere draftklasse nach eigenen einträgen
-				filteredAnalyses = supabaseData.selectedDraftClass.filter(
-					(entry) => entry.user_id == supabaseData.currentUser.id,
-				);
-			} else {
-				// filtere draftklasse nach einträgen von anderen
-				filteredAnalyses = supabaseData.selectedDraftClass.filter(
-					(entry) => entry.user_id != supabaseData.currentUser.id,
-				);
-			}
+			ownAnalyses.value = filterAnalyses(tmpAnalyses);
 
-			analyses.value = filteredAnalyses
-				.filter((analysis) => analysis.pick.includes(props.draftPick.pick))
-				.sort((a, b) => b.year - a.year);
+			// filtere draftklasse nach einträgen von anderen
+			tmpAnalyses = supabaseData.selectedDraftClass.filter(
+				(entry) => entry.user_id != supabaseData.currentUser.id,
+			);
+
+			otherAnalyses.value = filterAnalyses(tmpAnalyses);
 		} else {
 			analyses.value = [];
 		}
@@ -147,6 +183,12 @@ watch(
 	},
 	{ deep: true, immediate: true },
 );
+
+const filterAnalyses = (analyses) => {
+	return analyses
+		.filter((analysis) => analysis.pick.includes(props.draftPick.pick))
+		.sort((a, b) => b.year - a.year);
+};
 </script>
 
 <style lang="scss" scoped>
