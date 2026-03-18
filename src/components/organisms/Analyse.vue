@@ -36,6 +36,7 @@
 			</div>
 
 			<div
+				v-if="showEditButton"
 				class="uk-grid-width-auto@s uk-flex uk-flex-center uk-flex-middle uk-background-secondary uk-light edit"
 				@click="showEditForm = true"
 			>
@@ -65,6 +66,10 @@ const props = defineProps({
 	data: {
 		type: Object,
 		required: true,
+	},
+	showEditButton: {
+		type: Boolean,
+		default: true,
 	},
 });
 
