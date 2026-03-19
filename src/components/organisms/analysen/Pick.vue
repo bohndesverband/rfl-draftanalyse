@@ -77,8 +77,6 @@ div:has(> .grade) {
 	display: flex;
 }
 
-
-
 .edit {
 	cursor: pointer;
 

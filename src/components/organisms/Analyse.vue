@@ -1,7 +1,7 @@
 <template>
 	<!-- <pre>{{ data }}</pre> -->
-	<Trade v-if="type === 'trade'" :data="props.data" />
-	<Pick v-else :data="props.data" />
+	<Trade v-if="type === 'trade'" :data="data" />
+	<Pick v-else :data="props.data" :showEditButton="showEditButton" />
 </template>
 
 <script setup>
