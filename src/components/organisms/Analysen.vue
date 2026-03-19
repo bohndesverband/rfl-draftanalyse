@@ -1,5 +1,6 @@
 <template>
 	<!-- <pre>{{ supabaseData.selectedDraftClass }}</pre> -->
+	<!-- <pre>{{ ownAnalyses }}</pre> -->
 	<div class="draftpick uk-position-relative">
 		<div data-uk-grid>
 			<div class="uk-width-2-3@m uk-position-relative">
@@ -136,26 +137,30 @@ watch(
 	() => supabaseData.selectedDraftClass,
 	async () => {
 		// wenn filter für draftklasse und team gesetzt ist
+
 		if (
-			supabaseData.selectedDraftClass &&
-			supabaseData.selectedDraftClass.length > 0
+			!supabaseData.selectedDraftClass ||
+			supabaseData.selectedDraftClass.length == 0
 		) {
-			// filtere draftklasse nach eigenen einträgen
-			let tmpAnalyses = supabaseData.selectedDraftClass.filter(
-				(entry) => entry.user_id == supabaseData.currentUser.id,
-			);
-
-			ownAnalyses.value = filterAnalyses(tmpAnalyses);
-
-			// filtere draftklasse nach einträgen von anderen
-			tmpAnalyses = supabaseData.selectedDraftClass.filter(
-				(entry) => entry.user_id != supabaseData.currentUser.id,
-			);
-
-			otherAnalyses.value = filterAnalyses(tmpAnalyses);
-		} else {
+			ownAnalyses.value = [];
+			otherAnalyses.value = [];
 			analyses.value = [];
+			return;
 		}
+
+		// filtere draftklasse nach eigenen einträgen
+		let tmpAnalyses = supabaseData.selectedDraftClass.filter(
+			(entry) => entry.user_id == supabaseData.currentUser.id,
+		);
+
+		ownAnalyses.value = filterAnalyses(tmpAnalyses);
+
+		// filtere draftklasse nach einträgen von anderen
+		tmpAnalyses = supabaseData.selectedDraftClass.filter(
+			(entry) => entry.user_id != supabaseData.currentUser.id,
+		);
+
+		otherAnalyses.value = filterAnalyses(tmpAnalyses);
 	},
 	{ deep: true, immediate: true },
 );
