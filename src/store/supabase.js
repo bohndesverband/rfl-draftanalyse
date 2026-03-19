@@ -10,7 +10,6 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			selectedDraftClass: [],
 			filteredDraftClass: "",
 			filteredTeam: "",
-			filteredPick: "",
 			alertMessage: null,
 			alertType: null,
 		};

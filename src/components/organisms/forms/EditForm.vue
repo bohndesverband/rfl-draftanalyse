@@ -1,4 +1,5 @@
 <template>
+	{{ data }}
 	<div class="uk-background-default uk-padding-small">
 		<h3 class="uk-h4">Analyse bearbeiten</h3>
 		<UploadForm v-if="supabaseData.filteredPick == 'trades'" />
@@ -113,7 +114,7 @@ const submitForm = async (formData) => {
 	if (formData.id === "submit") {
 		let pick = props.data.pick;
 
-		if (props.data.pick == "trade") {
+		if (!pick && pick == "trade") {
 			const now = new Date().valueOf();
 			pick = `trade_${now}`;
 		}

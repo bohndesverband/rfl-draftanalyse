@@ -1,9 +1,9 @@
 <template>
-	<!-- <pre>{{ supabaseData.selectedDraftClass }}</pre> -->
-	<!-- <pre>{{ ownAnalyses }}</pre> -->
+	<!-- <pre>{{ players }}</pre> -->
+	<!-- <pre>{{ tradeAnalyses }}</pre> -->
 	<div class="draftpick uk-position-relative">
 		<div data-uk-grid>
-			<div class="uk-width-2-3@m uk-position-relative">
+			<div class="uk-width-expand@m uk-position-relative">
 				<div class="uk-position-top-right uk-button-group">
 					<button
 						v-if="!showEditForm"
@@ -46,15 +46,25 @@
 				<!-- filter die eigenen analysen nach den draftpicks -->
 				<!-- sortiere analysen nach jahr -->
 				<ul class="uk-list uk-list-striped">
-					<Analyse
-						v-for="analysis in ownAnalyses"
-						:key="analysis.id"
-						:data="analysis"
-					/>
+					<slot v-if="draftPick.pick === 'trade'">
+						<Analyse
+							v-for="trade in tradeAnalyses"
+							:key="trade.id"
+							:data="trade"
+						/>
+					</slot>
+
+					<slot v-else>
+						<Analyse
+							v-for="analysis in ownAnalyses"
+							:key="analysis.id"
+							:data="analysis"
+						/>
+					</slot>
 				</ul>
 			</div>
 
-			<div class="uk-width-1-3@m">
+			<div v-if="draftPick.pick != 'trade'" class="uk-width-1-3@m">
 				<ul class="uk-accordion-default" data-uk-accordion>
 					<li>
 						<a class="uk-accordion-title" href
@@ -85,10 +95,11 @@
 
 import ImageUpload from "@/components/molecules/ImageUpload.vue";
 import Analyse from "@/components/organisms/Analyse.vue";
+
 import EditForm from "@/components/organisms/forms/EditForm.vue";
 
 import { useSupabaseStore } from "@/store/supabase";
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 
 //
 // Constants
@@ -114,6 +125,7 @@ const analyses = ref([]);
 
 const ownAnalyses = ref([]);
 const otherAnalyses = ref([]);
+const tradeAnalyses = ref([]);
 
 const image = ref("");
 const showEditForm = ref(false);
@@ -145,6 +157,7 @@ watch(
 			ownAnalyses.value = [];
 			otherAnalyses.value = [];
 			analyses.value = [];
+			tradeAnalyses.value = [];
 			return;
 		}
 
@@ -161,6 +174,8 @@ watch(
 		);
 
 		otherAnalyses.value = filterAnalyses(tmpAnalyses);
+
+		groupAnalysesByPick();
 	},
 	{ deep: true, immediate: true },
 );
@@ -193,6 +208,36 @@ const filterAnalyses = (analyses) => {
 	return analyses
 		.filter((analysis) => analysis.pick.includes(props.draftPick.pick))
 		.sort((a, b) => b.year - a.year);
+};
+
+const groupAnalysesByPick = () => {
+	const map = new Map();
+
+	[...ownAnalyses.value, ...otherAnalyses.value]
+		.filter((analysis) => analysis.pick.includes("trade"))
+		.forEach((a) => {
+			if (!map.has(a.pick)) {
+				map.set(a.pick, {
+					team_id: a.team_id,
+					draft_class: a.draft_class,
+					pick: a.pick,
+					analysis: [],
+				});
+			}
+
+			map.get(a.pick).analysis.push({
+				id: a.id,
+				created_at: a.created_at,
+				year: a.year,
+				text: a.text,
+				grade: a.grade,
+				user_id: a.user_id,
+				last_update: a.last_update,
+				pick: a.pick,
+			});
+		});
+
+	tradeAnalyses.value = Array.from(map.values());
 };
 </script>
 
