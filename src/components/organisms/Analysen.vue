@@ -65,23 +65,7 @@
 			</div>
 
 			<div v-if="draftPick.pick != 'trade'" class="uk-width-1-3@m">
-				<ul class="uk-accordion-default" data-uk-accordion>
-					<li>
-						<a class="uk-accordion-title" href
-							>+ Zeige Einschätzung von anderen</a
-						>
-						<div class="uk-accordion-content">
-							<ul class="uk-list uk-list-striped">
-								<Analyse
-									v-for="analysis in otherAnalyses"
-									:key="analysis.id"
-									:data="analysis"
-									:showEditButton="false"
-								/>
-							</ul>
-						</div>
-					</li>
-				</ul>
+				<AnalyseVonAnderen :data="otherAnalyses" />
 			</div>
 		</div>
 	</div>
@@ -95,11 +79,11 @@
 
 import ImageUpload from "@/components/molecules/ImageUpload.vue";
 import Analyse from "@/components/organisms/Analyse.vue";
-
 import EditForm from "@/components/organisms/forms/EditForm.vue";
+import AnalyseVonAnderen from "@/components/molecules/analysen/AnalyseVonAnderen.vue";
 
 import { useSupabaseStore } from "@/store/supabase";
-import { ref, watch, computed } from "vue";
+import { ref, watch } from "vue";
 
 //
 // Constants

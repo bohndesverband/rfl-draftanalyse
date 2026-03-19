@@ -9,33 +9,69 @@
 			<i data-uk-icon="icon: plus"></i>
 		</button>
 
-		<slot v-for="trade in data.analysis" :key="trade.id">
-			<EditForm
-				v-if="showSpecificEditForm === trade.id"
-				:data="trade"
-				@submit="showSpecificEditForm = false"
-				@reset="showSpecificEditForm = false"
-				:key="trade.id"
-			/>
+		<div data-uk-grid>
+			<div class="uk-width-expand@m">
+				<slot v-for="trade in ownAnalyses" :key="trade.id">
+					<EditForm
+						v-if="showSpecificEditForm === trade.id"
+						:data="trade"
+						@submit="showSpecificEditForm = false"
+						@reset="showSpecificEditForm = false"
+						:key="trade.id"
+					/>
 
-			<div v-else class="uk-grid-collapse" data-uk-grid>
-				<div class="uk-width-expand@s">
-					<AnalyseContent :title="trade.year" :content="trade.text" />
-				</div>
+					<div v-else class="uk-grid-collapse" data-uk-grid>
+						<div class="uk-width-expand@s">
+							<AnalyseContent :title="trade.year" :content="trade.text" />
+						</div>
 
-				<div class="uk-width-auto@s">
-					<AnalyseGrade :grade="trade.grade" />
-				</div>
+						<div class="uk-width-auto@s">
+							<AnalyseGrade :grade="trade.grade" />
+						</div>
 
-				<div
-					v-if="showEditButton"
-					class="uk-grid-width-auto@s uk-flex uk-flex-center uk-flex-middle uk-background-secondary uk-light edit"
-					@click="showSpecificEditForm = trade.id"
-				>
-					<i class="uk-padding-small" data-uk-icon="pencil"></i>
-				</div>
+						<div
+							v-if="showEditButton"
+							class="uk-grid-width-auto@s uk-flex uk-flex-center uk-flex-middle uk-background-secondary uk-light edit"
+							@click="showSpecificEditForm = trade.id"
+						>
+							<i class="uk-padding-small" data-uk-icon="pencil"></i>
+						</div>
+					</div>
+				</slot>
 			</div>
-		</slot>
+
+			<div class="uk-width-1-3@m">
+				<ul
+					v-if="otherAnalyses.length > 0"
+					class="uk-accordion-default"
+					data-uk-accordion
+				>
+					<li>
+						<a class="uk-accordion-title" href
+							>+ Zeige Einschätzung von anderen</a
+						>
+						<div class="uk-accordion-content">
+							<ul class="uk-list uk-list-striped">
+								<li v-for="trade in otherAnalyses" :key="trade.id">
+									<div class="uk-grid-collapse" data-uk-grid>
+										<div class="uk-width-expand@s">
+											<AnalyseContent
+												:title="trade.year"
+												:content="trade.text"
+											/>
+										</div>
+
+										<div class="uk-width-auto@s">
+											<AnalyseGrade :grade="trade.grade" />
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
 	</li>
 </template>
 
@@ -49,7 +85,8 @@ import AnalyseContent from "@/components/molecules/analysen/AnalyseContent.vue";
 import AnalyseGrade from "@/components/atoms/analysen/AnalyseGrade.vue";
 import EditForm from "@/components/organisms/forms/EditForm.vue";
 import ImageUpload from "@/components/molecules/ImageUpload.vue";
-import { onMounted, ref } from "vue";
+
+import { onMounted, ref, watch } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 //
 // Constants
@@ -68,7 +105,8 @@ const props = defineProps({
 });
 
 const supabaseData = useSupabaseStore();
-const showEditForm = ref(false);
+const ownAnalyses = ref([]);
+const otherAnalyses = ref([]);
 const showSpecificEditForm = ref(null);
 const image = ref("");
 
@@ -76,6 +114,20 @@ const image = ref("");
 // Functions
 //
 // ========================================================================
+
+watch(
+	() => props.data,
+	() => {
+		ownAnalyses.value = props.data.analysis.filter(
+			(analysis) => analysis.user_id === supabaseData.currentUser.id,
+		);
+
+		otherAnalyses.value = props.data.analysis.filter(
+			(analysis) => analysis.user_id !== supabaseData.currentUser.id,
+		);
+	},
+	{ immediate: true },
+);
 
 onMounted(async () => {
 	image.value = await supabaseData.fetchFile(props.data.pick);
