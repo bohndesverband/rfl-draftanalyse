@@ -1,8 +1,6 @@
 <template>
-	{{ data }}
 	<div class="uk-background-default uk-padding-small">
 		<h3 class="uk-h4">Analyse bearbeiten</h3>
-		<UploadForm v-if="supabaseData.filteredPick == 'trades'" />
 		<Form :fields="formFields" @submit="submitForm" @reset="emit('reset')" />
 	</div>
 </template>
@@ -16,7 +14,6 @@
 import Form from "@/components/molecules/Form.vue";
 import { reactive } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
-import UploadForm from "@/components/organisms/forms/UploadForm.vue";
 
 //
 // Constants

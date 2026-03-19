@@ -1,23 +1,10 @@
 <template>
 	<li>
-		<ImageUpload
-			v-if="data.pick.includes('trade')"
-			:image="image"
-			:draftPick="data.pick"
-		/>
-
-		<EditForm
-			v-if="showEditForm"
-			:data="data"
-			@submit="showEditForm = false"
-			@reset="showEditForm = false"
-			:key="data.id"
-		/>
+		<ImageUpload :image="image" :draftPick="data.pick" />
 
 		<button
-			v-else
 			class="uk-button uk-button-secondary uk-margin-bottom"
-			@click="showEditForm = true"
+			@click="showImageUpload = true"
 		>
 			<i data-uk-icon="icon: plus"></i>
 		</button>

@@ -1,5 +1,5 @@
 <template>
-	<!-- <pre>{{ players }}</pre> -->
+	<!-- <pre>{{ draftPick }}</pre> -->
 	<!-- <pre>{{ tradeAnalyses }}</pre> -->
 	<div class="draftpick uk-position-relative">
 		<div data-uk-grid>
@@ -13,7 +13,7 @@
 						<i data-uk-icon="icon: plus"></i>
 					</button>
 					<button
-						v-if="!image"
+						v-if="!image && draftPick.pick !== 'trade'"
 						class="uk-button uk-button-primary"
 						@click="showUploadForm = !showUploadForm"
 					>
