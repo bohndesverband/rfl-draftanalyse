@@ -111,7 +111,7 @@ const submitForm = async (formData) => {
 	if (formData.id === "submit") {
 		let pick = props.data.pick;
 
-		if (!pick && pick == "trade") {
+		if (pick === "trade") {
 			const now = new Date().valueOf();
 			pick = `trade_${now}`;
 		}
