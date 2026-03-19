@@ -1,93 +1,104 @@
 <template>
-	<li>
-		<!-- <pre>{{ data }}</pre> -->
-		<ImageUpload :image="image" :draftPick="data.pick" />
-
-		<EditForm
-			v-if="showEditForm"
-			:data="data"
-			@submit="showEditForm = false"
-			@reset="showEditForm = false"
-			:key="data.pick"
-		/>
-
-		<button
-			v-else
-			class="uk-button uk-button-secondary uk-margin-bottom"
-			@click="showEditForm = true"
-		>
-			<i data-uk-icon="icon: plus"></i>
-		</button>
-
-		<div data-uk-grid>
-			<div class="uk-width-expand@m">
-				<slot v-for="trade in data.analysis" :key="trade.id">
-					<EditForm
-						v-if="showSpecificEditForm == trade.id"
-						:data="trade"
-						@submit="showSpecificEditForm = false"
-						@reset="showSpecificEditForm = false"
-						:key="trade.id"
-					/>
-
-					<slot
-						v-for="analysis in ownAnalyses.filter((a) => a.id === trade.id)"
-						:key="analysis.id"
-					>
-						<div class="uk-grid-collapse" data-uk-grid>
-							<div class="uk-width-expand@s">
-								<AnalyseContent
-									:title="analysis.year"
-									:content="analysis.text"
-								/>
-							</div>
-
-							<div class="uk-width-auto@s">
-								<AnalyseGrade :grade="analysis.grade" />
-							</div>
-
-							<div
-								v-if="showEditButton"
-								class="uk-grid-width-auto@s uk-flex uk-flex-center uk-flex-middle uk-background-secondary uk-light edit"
-								@click="showSpecificEditForm = trade.id"
-							>
-								<i class="uk-padding-small" data-uk-icon="pencil"></i>
-							</div>
-						</div>
-					</slot>
-				</slot>
+	<li class="uk-margin-medium-top">
+		<div class="uk-card uk-card-default">
+			<div class="uk-card-media-top">
+				<ImageUpload :image="image" :draftPick="data.pick" />
 			</div>
 
-			<div class="uk-width-1-3@m">
-				<ul
-					v-if="otherAnalyses.length > 0"
-					class="uk-accordion-default"
-					data-uk-accordion
-				>
-					<li>
-						<a class="uk-accordion-title" href
-							>+ Zeige Einschätzung von anderen</a
-						>
-						<div class="uk-accordion-content">
-							<ul class="uk-list uk-list-striped">
-								<li v-for="trade in otherAnalyses" :key="trade.id">
-									<div class="uk-grid-collapse" data-uk-grid>
-										<div class="uk-width-expand@s">
-											<AnalyseContent
-												:title="trade.year"
-												:content="trade.text"
-											/>
-										</div>
+			<div class="uk-card-body uk-padding-small">
+				<EditForm
+					v-if="showEditForm"
+					:data="data"
+					@submit="showEditForm = false"
+					@reset="showEditForm = false"
+					:key="data.pick"
+				/>
 
-										<div class="uk-width-auto@s">
-											<AnalyseGrade :grade="trade.grade" />
+				<button
+					v-else
+					class="uk-button uk-button-secondary uk-margin-bottom"
+					@click="showEditForm = true"
+				>
+					<i data-uk-icon="icon: plus"></i>
+				</button>
+
+				<div data-uk-grid>
+					<div class="uk-width-expand@m">
+						<slot v-for="trade in data.analysis" :key="trade.id">
+							<EditForm
+								v-if="showSpecificEditForm == trade.id"
+								:data="trade"
+								@submit="showSpecificEditForm = false"
+								@reset="showSpecificEditForm = false"
+								:key="trade.id"
+							/>
+
+							<ul class="uk-list uk-list-striped">
+								<slot
+									v-for="analysis in ownAnalyses.filter(
+										(a) => a.id === trade.id,
+									)"
+									:key="analysis.id"
+								>
+									<li>
+										<div class="uk-grid-collapse" data-uk-grid>
+											<div class="uk-width-expand@s">
+												<AnalyseContent
+													:title="analysis.year"
+													:content="analysis.text"
+												/>
+											</div>
+
+											<div class="uk-width-auto@s">
+												<AnalyseGrade :grade="analysis.grade" />
+											</div>
+
+											<div
+												v-if="showEditButton"
+												class="uk-grid-width-auto@s uk-flex uk-flex-center uk-flex-middle uk-background-secondary uk-light edit"
+												@click="showSpecificEditForm = trade.id"
+											>
+												<i class="uk-padding-small" data-uk-icon="pencil"></i>
+											</div>
 										</div>
-									</div>
-								</li>
+									</li>
+								</slot>
 							</ul>
-						</div>
-					</li>
-				</ul>
+						</slot>
+					</div>
+
+					<div class="uk-width-1-3@m">
+						<ul
+							v-if="otherAnalyses.length > 0"
+							class="uk-accordion-default"
+							data-uk-accordion
+						>
+							<li>
+								<a class="uk-accordion-title" href
+									>+ Zeige Einschätzung von anderen</a
+								>
+								<div class="uk-accordion-content">
+									<ul class="uk-list uk-list-striped">
+										<li v-for="trade in otherAnalyses" :key="trade.id">
+											<div class="uk-grid-collapse" data-uk-grid>
+												<div class="uk-width-expand@s">
+													<AnalyseContent
+														:title="trade.year"
+														:content="trade.text"
+													/>
+												</div>
+
+												<div class="uk-width-auto@s">
+													<AnalyseGrade :grade="trade.grade" />
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</div>
 	</li>

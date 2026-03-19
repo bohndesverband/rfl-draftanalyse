@@ -45,7 +45,10 @@
 
 				<!-- filter die eigenen analysen nach den draftpicks -->
 				<!-- sortiere analysen nach jahr -->
-				<ul class="uk-list uk-list-striped">
+				<ul
+					class="uk-list"
+					:class="draftPick.pick != 'trade' ? 'uk-list-striped' : ''"
+				>
 					<slot v-if="draftPick.pick === 'trade'">
 						<Analyse
 							v-for="trade in tradeAnalyses.sort(
