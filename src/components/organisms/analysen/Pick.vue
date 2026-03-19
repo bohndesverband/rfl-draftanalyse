@@ -36,7 +36,7 @@
 import AnalyseContent from "@/components/molecules/analysen/AnalyseContent.vue";
 import AnalyseGrade from "@/components/atoms/analysen/AnalyseGrade.vue";
 import EditForm from "@/components/organisms/forms/EditForm.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 //
 // Constants
