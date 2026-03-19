@@ -8,7 +8,7 @@
 	<div v-if="image" class="uk-position-relative">
 		<button
 			class="uk-position-top-right uk-position-small uk-button uk-button-secondary uk-button-small uk-light uk-flex uk-flex-center uk-flex-middle uk-padding-small"
-			@click="showUploadForm = true"
+			@click="showUploadForm = !showUploadForm"
 		>
 			<i data-uk-icon="icon: pencil"></i>
 		</button>

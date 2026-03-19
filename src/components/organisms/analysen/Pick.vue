@@ -36,7 +36,7 @@
 import AnalyseContent from "@/components/molecules/analysen/AnalyseContent.vue";
 import AnalyseGrade from "@/components/atoms/analysen/AnalyseGrade.vue";
 import EditForm from "@/components/organisms/forms/EditForm.vue";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 //
 // Constants
@@ -64,9 +64,13 @@ const image = ref("");
 //
 // ========================================================================
 
-onMounted(async () => {
-	image.value = await supabaseData.fetchFile(props.data.pick);
-});
+watch(
+	() => props.data,
+	async () => {
+		image.value = await supabaseData.fetchFile(props.data.pick);
+	},
+	{ immediate: true },
+);
 
 // Helper
 // ========================================================================

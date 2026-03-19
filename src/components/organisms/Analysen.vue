@@ -178,6 +178,7 @@ watch(
 			otherAnalyses.value = [];
 			analyses.value = [];
 			tradeAnalyses.value = [];
+			image.value = "";
 			return;
 		}
 

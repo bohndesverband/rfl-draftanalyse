@@ -1,42 +1,60 @@
 <template>
 	<li>
+		<!-- <pre>{{ data }}</pre> -->
 		<ImageUpload :image="image" :draftPick="data.pick" />
 
+		<EditForm
+			v-if="showEditForm"
+			:data="data"
+			@submit="showEditForm = false"
+			@reset="showEditForm = false"
+			:key="data.pick"
+		/>
+
 		<button
+			v-else
 			class="uk-button uk-button-secondary uk-margin-bottom"
-			@click="showImageUpload = true"
+			@click="showEditForm = true"
 		>
 			<i data-uk-icon="icon: plus"></i>
 		</button>
 
 		<div data-uk-grid>
 			<div class="uk-width-expand@m">
-				<slot v-for="trade in ownAnalyses" :key="trade.id">
+				<slot v-for="trade in data.analysis" :key="trade.id">
 					<EditForm
-						v-if="showSpecificEditForm === trade.id"
+						v-if="showSpecificEditForm == trade.id"
 						:data="trade"
 						@submit="showSpecificEditForm = false"
 						@reset="showSpecificEditForm = false"
 						:key="trade.id"
 					/>
 
-					<div v-else class="uk-grid-collapse" data-uk-grid>
-						<div class="uk-width-expand@s">
-							<AnalyseContent :title="trade.year" :content="trade.text" />
-						</div>
+					<slot
+						v-for="analysis in ownAnalyses.filter((a) => a.id === trade.id)"
+						:key="analysis.id"
+					>
+						<div class="uk-grid-collapse" data-uk-grid>
+							<div class="uk-width-expand@s">
+								<AnalyseContent
+									:title="analysis.year"
+									:content="analysis.text"
+								/>
+							</div>
 
-						<div class="uk-width-auto@s">
-							<AnalyseGrade :grade="trade.grade" />
-						</div>
+							<div class="uk-width-auto@s">
+								<AnalyseGrade :grade="analysis.grade" />
+							</div>
 
-						<div
-							v-if="showEditButton"
-							class="uk-grid-width-auto@s uk-flex uk-flex-center uk-flex-middle uk-background-secondary uk-light edit"
-							@click="showSpecificEditForm = trade.id"
-						>
-							<i class="uk-padding-small" data-uk-icon="pencil"></i>
+							<div
+								v-if="showEditButton"
+								class="uk-grid-width-auto@s uk-flex uk-flex-center uk-flex-middle uk-background-secondary uk-light edit"
+								@click="showSpecificEditForm = trade.id"
+							>
+								<i class="uk-padding-small" data-uk-icon="pencil"></i>
+							</div>
 						</div>
-					</div>
+					</slot>
 				</slot>
 			</div>
 
@@ -86,7 +104,7 @@ import AnalyseGrade from "@/components/atoms/analysen/AnalyseGrade.vue";
 import EditForm from "@/components/organisms/forms/EditForm.vue";
 import ImageUpload from "@/components/molecules/ImageUpload.vue";
 
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 //
 // Constants
@@ -107,7 +125,8 @@ const props = defineProps({
 const supabaseData = useSupabaseStore();
 const ownAnalyses = ref([]);
 const otherAnalyses = ref([]);
-const showSpecificEditForm = ref(null);
+const showEditForm = ref(false);
+const showSpecificEditForm = ref("");
 const image = ref("");
 
 //
@@ -117,7 +136,7 @@ const image = ref("");
 
 watch(
 	() => props.data,
-	() => {
+	async () => {
 		ownAnalyses.value = props.data.analysis.filter(
 			(analysis) => analysis.user_id === supabaseData.currentUser.id,
 		);
@@ -125,13 +144,10 @@ watch(
 		otherAnalyses.value = props.data.analysis.filter(
 			(analysis) => analysis.user_id !== supabaseData.currentUser.id,
 		);
+		image.value = await supabaseData.fetchFile(props.data.pick);
 	},
 	{ immediate: true },
 );
-
-onMounted(async () => {
-	image.value = await supabaseData.fetchFile(props.data.pick);
-});
 
 // Helper
 // ========================================================================
