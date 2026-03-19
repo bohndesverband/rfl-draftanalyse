@@ -48,7 +48,9 @@
 				<ul class="uk-list uk-list-striped">
 					<slot v-if="draftPick.pick === 'trade'">
 						<Analyse
-							v-for="trade in tradeAnalyses"
+							v-for="trade in tradeAnalyses.sort(
+								(a, b) => b.analysis[0].id - a.analysis[0].id,
+							)"
 							:key="trade.id"
 							:data="trade"
 						/>
