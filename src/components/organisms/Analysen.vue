@@ -128,6 +128,42 @@ const loadImage = async (pick) => {
 	}
 };
 
+const filterAnalyses = (analyses) => {
+	return analyses
+		.filter((analysis) => analysis.pick.includes(props.draftPick.pick))
+		.sort((a, b) => b.year - a.year);
+};
+
+const groupAnalysesByPick = () => {
+	const map = new Map();
+
+	[...ownAnalyses.value, ...otherAnalyses.value]
+		.filter((analysis) => analysis.pick.includes("trade"))
+		.forEach((a) => {
+			if (!map.has(a.pick)) {
+				map.set(a.pick, {
+					team_id: a.team_id,
+					draft_class: a.draft_class,
+					pick: a.pick,
+					analysis: [],
+				});
+			}
+
+			map.get(a.pick).analysis.push({
+				id: a.id,
+				created_at: a.created_at,
+				year: a.year,
+				text: a.text,
+				grade: a.grade,
+				user_id: a.user_id,
+				last_update: a.last_update,
+				pick: a.pick,
+			});
+		});
+
+	tradeAnalyses.value = Array.from(map.values());
+};
+
 watch(
 	// wenn sich die gewählte draftklasse ändert
 	() => supabaseData.selectedDraftClass,
@@ -187,42 +223,6 @@ watch(
 	},
 	{ deep: true, immediate: true },
 );
-
-const filterAnalyses = (analyses) => {
-	return analyses
-		.filter((analysis) => analysis.pick.includes(props.draftPick.pick))
-		.sort((a, b) => b.year - a.year);
-};
-
-const groupAnalysesByPick = () => {
-	const map = new Map();
-
-	[...ownAnalyses.value, ...otherAnalyses.value]
-		.filter((analysis) => analysis.pick.includes("trade"))
-		.forEach((a) => {
-			if (!map.has(a.pick)) {
-				map.set(a.pick, {
-					team_id: a.team_id,
-					draft_class: a.draft_class,
-					pick: a.pick,
-					analysis: [],
-				});
-			}
-
-			map.get(a.pick).analysis.push({
-				id: a.id,
-				created_at: a.created_at,
-				year: a.year,
-				text: a.text,
-				grade: a.grade,
-				user_id: a.user_id,
-				last_update: a.last_update,
-				pick: a.pick,
-			});
-		});
-
-	tradeAnalyses.value = Array.from(map.values());
-};
 </script>
 
 <style lang="scss" scoped>
