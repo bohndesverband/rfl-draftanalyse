@@ -49,7 +49,7 @@ const props = defineProps({
 		width: 600px;
 		top: 0;
 		left: 0;
-		translate: calc(10% + attr(data-grade %) * -80 / 5);
+		translate: calc(20% + attr(data-grade %) * -80 / 5);
 		bottom: 0;
 		background: linear-gradient(
 			90deg,
@@ -57,7 +57,7 @@ const props = defineProps({
 			rgba(124, 204, 121, 1) 30%,
 			rgba(210, 210, 108, 1) 40%,
 			rgba(218, 152, 90, 1) 60%,
-			rgba(237, 83, 83, 1) 100%
+			rgba(237, 83, 83, 1) 80%
 		);
 		z-index: 0;
 	}
