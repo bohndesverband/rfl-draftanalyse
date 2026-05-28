@@ -7,7 +7,11 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			currentUser: null,
 			rflTeams: [],
 			rflDrafts: [],
+			rflDraftOrder: [],
+			rflTrades: [],
+			filteredRflTrades: [],
 			selectedDraftClass: [],
+			gradeDraftClasses: [],
 			filteredDraftClass: "",
 			filteredTeam: "",
 			alertMessage: null,
@@ -104,8 +108,68 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			}
 		},
 
+		// RFL Drafts
+		// ========================================================================
+
+		async fetchRflDraftOrdersByYear(year) {
+			if (!year) return;
+
+			try {
+				const { data, error } = await supabase
+					.from("RFL Draftorders")
+					.select()
+					.eq("season", year);
+				if (error) throw error;
+				this.rflDraftOrder = data;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
+		// RFL Trades
+		// ========================================================================
+
+		async fetchRflTradesById(teamID) {
+			try {
+				const { data, error } = await supabase
+					.from("RFL Trades")
+					.select()
+					.contains("franchise_ids", `{${teamID}}`);
+
+				console.log("🚀 ~ error:", error);
+				console.log("🚀 ~ data:", data);
+				if (error) throw error;
+				this.rflTrades = data;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
+
+		findTrade(string) {
+			return this.rflTrades.filter((trade) => {
+				return trade.asset_names.includes(string);
+			});
+		},
+
 		// Analysen
 		// ========================================================================
+
+		async fetchDraftClassNotesByYear(draftClass) {
+			try {
+				const { data, error } = await supabase
+					.from("Draftanalysen")
+					.select()
+					.eq("pick", "klasse")
+					.eq("draft_class", draftClass);
+				if (error) throw error;
+				this.gradeDraftClasses = data;
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
 
 		async fetchDraftClassAnalysis(draftClass, team) {
 			try {

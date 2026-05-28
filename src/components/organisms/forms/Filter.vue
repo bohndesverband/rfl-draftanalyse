@@ -12,6 +12,7 @@
 import Form from "@/components/molecules/Form.vue";
 import { reactive, ref, watch, onMounted } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
+import { useRouter } from "vue-router";
 
 //
 // Constants
@@ -20,6 +21,7 @@ import { useSupabaseStore } from "@/store/supabase";
 
 const supabaseData = useSupabaseStore();
 const currentYear = new Date().getFullYear();
+const router = useRouter();
 
 const formFields = reactive({
 	draftClass: {
@@ -33,8 +35,8 @@ const formFields = reactive({
 				value: "",
 				disabled: true,
 			},
-			...Array.from({ length: currentYear - 2022 }, (_, i) => {
-				return { value: `${2023 + i}`, text: 2023 + i };
+			...Array.from({ length: currentYear - 2023 }, (_, i) => {
+				return { value: `${2024 + i}`, text: 2024 + i };
 			}),
 		],
 	},
@@ -81,6 +83,38 @@ watch(
 	{ immediate: true },
 );
 
+// Watch form field values and run filter on every update
+watch(
+	() => [formFields.team.value],
+	async () => {
+		if (formFields.team.value) {
+			await supabaseData.fetchRflTradesById(formFields.team.value);
+		}
+	},
+);
+
+watch(
+	() => supabaseData.filteredTeam,
+	(teamId) => {
+		if (teamId && formFields.team.value !== teamId) {
+			formFields.team.value = teamId;
+		} else if (!teamId) {
+			formFields.team.value = "";
+		}
+	},
+	{ immediate: true },
+);
+
+watch(
+	() => supabaseData.filteredDraftClass,
+	(draftClass) => {
+		if (draftClass && formFields.draftClass.value !== draftClass) {
+			formFields.draftClass.value = draftClass;
+		}
+	},
+	{ immediate: true },
+);
+
 // watch(
 // 	() => supabaseData.filteredDraftClass && supabaseData.filteredTeam,
 // 	() => {
@@ -101,6 +135,19 @@ const updateData = async (formData) => {
 	supabaseData.filteredTeam = selectedTeam;
 
 	await supabaseData.fetchDraftClassAnalysis(selectedDraftClass, selectedTeam);
+	await supabaseData.fetchRflDraftOrdersByYear(selectedDraftClass);
+
+	// wenn Draftklasse ausgewählt, lese alle Grades für die gesamte Klasse im ausgewählten Jahr ein
+	if (selectedDraftClass) {
+		await supabaseData.fetchDraftClassNotesByYear(selectedDraftClass);
+	}
+
+	if (selectedDraftClass && selectedTeam) {
+		router.push({
+			name: "edit",
+			params: { year: selectedDraftClass, id: selectedTeam },
+		});
+	}
 
 	//  availablePicks.value = supabaseData.rflDrafts
 	//   .filter(

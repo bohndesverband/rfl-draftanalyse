@@ -17,7 +17,7 @@
 
 import Alert from "@/components/atoms/Alert.vue";
 
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
 
 //
@@ -26,6 +26,7 @@ import { useSupabaseStore } from "@/store/supabase";
 // ========================================================================
 
 const supabaseData = useSupabaseStore();
+const trades = ref([]);
 
 //
 // Functions

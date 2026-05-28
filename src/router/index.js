@@ -1,18 +1,30 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-import Home from "@/views/Home.vue";
+import SignIn from "@/views/SignIn.vue";
 import SignUp from "@/views/SignUp.vue";
+import Overview from "@/views/Overview.vue";
+import Edit from "@/views/Edit.vue";
 
 const routes = [
 	{
 		path: "/",
-		name: "home",
-		component: Home,
+		name: "signIn",
+		component: SignIn,
 	},
 	{
 		path: "/registrieren",
 		name: "signup",
 		component: SignUp,
+	},
+	{
+		path: "/overview",
+		name: "overview",
+		component: Overview,
+	},
+	{
+		path: "/edit/:year/:id",
+		name: "edit",
+		component: Edit,
 	},
 	{
 		// 404
