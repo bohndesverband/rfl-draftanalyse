@@ -8,11 +8,13 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			rflTeams: [],
 			rflDrafts: [],
 			rflDraftOrder: [],
-			rflTrades: [],
-			filteredRflTrades: [],
-			selectedDraftClass: [],
+			selectedDraftAnalysis: [],
+			ownAnalysis: [],
+			otherAnalysis: [],
 			gradeDraftClasses: [],
-			filteredDraftClass: "",
+			teamTrades: [],
+			selectedDraftClass: [],
+			selectedDraftYear: "",
 			filteredTeam: "",
 			alertMessage: null,
 			alertType: null,
@@ -108,11 +110,19 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			}
 		},
 
-		// RFL Drafts
-		// ========================================================================
+		findDraftClass(teamID, year) {
+			try {
+				this.selectedDraftClass = this.rflDrafts.filter(
+					(pick) => pick.franchise_id === teamID && pick.season === year,
+				);
+			} catch (error) {
+				this.alertType = "error";
+				this.alertMessage = error.message;
+			}
+		},
 
 		async fetchRflDraftOrdersByYear(year) {
-			if (!year) return;
+			if (!year || typeof year != "string") return;
 
 			try {
 				const { data, error } = await supabase
@@ -130,25 +140,23 @@ export const useSupabaseStore = defineStore("supabaseData", {
 		// RFL Trades
 		// ========================================================================
 
-		async fetchRflTradesById(teamID) {
+		async fetchteamTradesById(teamID) {
 			try {
 				const { data, error } = await supabase
 					.from("RFL Trades")
 					.select()
 					.contains("franchise_ids", `{${teamID}}`);
 
-				console.log("🚀 ~ error:", error);
-				console.log("🚀 ~ data:", data);
 				if (error) throw error;
-				this.rflTrades = data;
+				this.teamTrades = data;
 			} catch (error) {
 				this.alertType = "error";
 				this.alertMessage = error.message;
 			}
 		},
 
-		findTrade(string) {
-			return this.rflTrades.filter((trade) => {
+		findTrades(string) {
+			return this.teamTrades.filter((trade) => {
 				return trade.asset_names.includes(string);
 			});
 		},
@@ -181,7 +189,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 
 				if (error) throw error;
 
-				this.selectedDraftClass = data;
+				this.selectedDraftAnalysis = data;
 			} catch (error) {
 				console.log(error);
 
@@ -234,6 +242,10 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			}
 		},
 
+		setOwnAnalysis(analysis) {
+			this.ownAnalysis = analysis;
+		},
+
 		// Files
 		// ========================================================================
 
@@ -252,7 +264,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 				// 		? this.currentAnalysis.pick
 				// 		: this.filteredPick;
 
-				const filename = `${this.filteredDraftClass}_${this.filteredTeam}_${id}.${fileExtension}`;
+				const filename = `${this.selectedDraftYear}_${this.filteredTeam}_${id}.${fileExtension}`;
 
 				const { data, error } = await supabase.storage
 					.from("Screenshots")
@@ -262,7 +274,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 
 				this.upsertFileInfo({
 					name: filename,
-					draft_class: this.filteredDraftClass,
+					draft_class: this.selectedDraftYear,
 					team_id: this.filteredTeam,
 					pick: id,
 				});
@@ -292,7 +304,7 @@ export const useSupabaseStore = defineStore("supabaseData", {
 				const { data, error } = await supabase
 					.from("Bilder")
 					.select("name")
-					.eq("draft_class", this.filteredDraftClass)
+					.eq("draft_class", this.selectedDraftYear)
 					.eq("team_id", this.filteredTeam)
 					.eq("pick", pick);
 
@@ -329,12 +341,14 @@ export const useSupabaseStore = defineStore("supabaseData", {
 			this.currentPlayerAnalysis = [];
 			this.currentAnalysis = [];
 			this.showEditCard = false;
-			this.filteredDraftClass = "";
+			this.selectedDraftYear = "";
 			this.filteredTeam = "";
 			this.filteredPick = "";
 			this.alertMessage = null;
 			this.alertType = null;
 			this.currentFile = null;
+
+			// TODO: update
 		},
 	},
 });

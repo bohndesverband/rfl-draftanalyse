@@ -1,9 +1,13 @@
 <template>
+	<!-- <pre>{{ data }}</pre> -->
+
 	<li class="uk-margin-medium-top">
 		<div class="uk-card uk-card-default">
-			<div class="uk-card-media-top">
+			<!-- <div class="uk-card-media-top">
 				<ImageUpload :image="image" :draftPick="data.pick" />
-			</div>
+			</div> -->
+
+			<Trade :data="data" />
 
 			<div class="uk-card-body uk-padding-small">
 				<EditForm
@@ -114,6 +118,7 @@ import AnalyseContent from "@/components/molecules/analysen/AnalyseContent.vue";
 import AnalyseGrade from "@/components/atoms/analysen/AnalyseGrade.vue";
 import EditForm from "@/components/organisms/forms/EditForm.vue";
 import ImageUpload from "@/components/molecules/ImageUpload.vue";
+import Trade from "@/components/organisms/Trade.vue";
 
 import { ref, watch } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
@@ -145,20 +150,20 @@ const image = ref("");
 //
 // ========================================================================
 
-watch(
-	() => props.data,
-	async () => {
-		ownAnalyses.value = props.data.analysis.filter(
-			(analysis) => analysis.user_id === supabaseData.currentUser.id,
-		);
+// watch(
+// 	() => props.data,
+// 	async () => {
+// 		ownAnalyses.value = props.data.analysis.filter(
+// 			(analysis) => analysis.user_id === supabaseData.currentUser.id,
+// 		);
 
-		otherAnalyses.value = props.data.analysis.filter(
-			(analysis) => analysis.user_id !== supabaseData.currentUser.id,
-		);
-		image.value = await supabaseData.fetchFile(props.data.pick);
-	},
-	{ immediate: true },
-);
+// 		otherAnalyses.value = props.data.analysis.filter(
+// 			(analysis) => analysis.user_id !== supabaseData.currentUser.id,
+// 		);
+// 		image.value = await supabaseData.fetchFile(props.data.pick);
+// 	},
+// 	{ immediate: true },
+// );
 
 // Helper
 // ========================================================================

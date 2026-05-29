@@ -3,7 +3,7 @@
 		class="uk-flex uk-flex-column uk-flex-middle uk-flex-center uk-padding-small grade"
 		:data-grade="grade"
 	>
-		<span>Note</span>
+		<span v-if="showTitle">Note</span>
 		<span>{{ grade }}</span>
 	</div>
 </template>
@@ -23,6 +23,10 @@ const props = defineProps({
 	grade: {
 		type: String,
 		required: true,
+	},
+	showTitle: {
+		type: Boolean,
+		default: true,
 	},
 });
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="uk-container uk-padding">
+	<div class="uk-container uk-container-large uk-padding">
 		<h1 class="uk-heading-primary">Draftanalyse bearbeiten</h1>
 
 		<Button

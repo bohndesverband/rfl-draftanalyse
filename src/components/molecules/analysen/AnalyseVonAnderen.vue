@@ -31,7 +31,7 @@ import Analyse from "@/components/organisms/Analyse.vue";
 
 const props = defineProps({
 	data: {
-		type: Object,
+		type: Array,
 		required: true,
 	},
 });

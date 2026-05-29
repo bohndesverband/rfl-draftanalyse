@@ -3,14 +3,16 @@
 
 	<div class="uk-container uk-container-small">
 		<Alert
-			v-if="!supabaseData.filteredDraftClass"
+			v-if="!supabaseData.selectedDraftYear.length > 0"
 			message="Wähle eine Draftklasse aus"
 		/>
 
 		<slot v-else>
-			<h2>Draftorder {{ supabaseData.filteredDraftClass }}</h2>
+			<h2>Draftorder {{ supabaseData.selectedDraftYear }}</h2>
 
-			<table class="uk-table uk-table-striped uk-margin-large-bottom">
+			<table
+				class="uk-table uk-table-striped uk-table-middle uk-margin-large-bottom"
+			>
 				<thead>
 					<tr>
 						<th colspan="2"></th>
@@ -19,10 +21,10 @@
 					<tr>
 						<th>Pick</th>
 						<th>Team</th>
-						<th>{{ supabaseData.filteredDraftClass }}</th>
-						<th>{{ +supabaseData.filteredDraftClass + 1 }}</th>
-						<th>{{ +supabaseData.filteredDraftClass + 3 }}</th>
-						<th>{{ +supabaseData.filteredDraftClass + 5 }}</th>
+						<th>{{ supabaseData.selectedDraftYear }}</th>
+						<th>{{ +supabaseData.selectedDraftYear + 1 }}</th>
+						<th>{{ +supabaseData.selectedDraftYear + 3 }}</th>
+						<th>{{ +supabaseData.selectedDraftYear + 5 }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -33,7 +35,7 @@
 								:to="{
 									name: 'edit',
 									params: {
-										year: supabaseData.filteredDraftClass,
+										year: supabaseData.selectedDraftYear,
 										id: pick.franchise_id,
 									},
 								}"
@@ -42,10 +44,12 @@
 								{{ pick.team_name }}
 							</router-link>
 						</td>
-						<td>{{ findGrade(pick.franchise_id, 0) }}</td>
-						<td>{{ findGrade(pick.franchise_id, 1) }}</td>
-						<td>{{ findGrade(pick.franchise_id, 3) }}</td>
-						<td>{{ findGrade(pick.franchise_id, 5) }}</td>
+						<td v-for="number in [0, 1, 3, 5]">
+							<AnalyseGrade
+								:grade="findGrade(pick.franchise_id, number)"
+								:showTitle="false"
+							/>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -61,6 +65,7 @@
 
 import Header from "@/components/organisms/Header.vue";
 import Alert from "@/components/atoms/Alert.vue";
+import AnalyseGrade from "@/components/atoms/analysen/AnalyseGrade.vue";
 
 import { ref, onMounted, computed } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
@@ -72,11 +77,11 @@ import { useSupabaseStore } from "@/store/supabase";
 
 const supabaseData = useSupabaseStore();
 const draftOrder = computed(() => {
-	if (!supabaseData.filteredDraftClass) return [];
+	if (!supabaseData.selectedDraftYear) return [];
 
 	// Filter draft order by selected class/season (field name: season)
 	const filtered = supabaseData.rflDraftOrder.filter(
-		(pick) => String(pick.season) === String(supabaseData.filteredDraftClass),
+		(pick) => String(pick.season) === String(supabaseData.selectedDraftYear),
 	);
 
 	// Merge with teams to attach `team_name` to each pick
@@ -111,9 +116,9 @@ onMounted(() => {
 const setTeamFilter = async (teamId) => {
 	supabaseData.filteredTeam = teamId;
 
-	if (supabaseData.filteredDraftClass) {
+	if (supabaseData.selectedDraftYear) {
 		await supabaseData.fetchDraftClassAnalysis(
-			supabaseData.filteredDraftClass,
+			supabaseData.selectedDraftYear,
 			teamId,
 		);
 	}
@@ -121,17 +126,12 @@ const setTeamFilter = async (teamId) => {
 
 // finde note für Jahr X
 const findGrade = (teamID, year) => {
-	console.log("🚀 ~ findGrade ~ year:", year);
-	console.log("🚀 ~ findGrade ~ teamID:", teamID);
-
 	const grade = supabaseData.gradeDraftClasses.filter((analysis) => {
-		console.log("🚀 ~ findGrade ~ analysis:", analysis);
 		return analysis.team_id == teamID && analysis.year == year;
 	});
 
 	if (!grade[0]?.grade) return "N/A";
 
-	console.log("🚀 ~ findGrade ~ test:", grade);
 	return grade[0].grade;
 };
 </script>

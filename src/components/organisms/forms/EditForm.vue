@@ -1,5 +1,6 @@
 <template>
-	<div class="uk-background-default uk-padding-small">
+	<!-- <pre>{{ data }}</pre> -->
+	<div class="uk-padding-small">
 		<h3 class="uk-h4">Analyse bearbeiten</h3>
 		<Form :fields="formFields" @submit="submitForm" @reset="emit('reset')" />
 	</div>
@@ -109,17 +110,18 @@ const emit = defineEmits(["submit", "reset"]);
 
 const submitForm = async (formData) => {
 	if (formData.id === "submit") {
-		let pick = props.data.pick;
+		let pick = props.data.roundPick;
+		// console.log("🚀 ~ submitForm ~ pick:", pick);
 
-		if (pick === "trade") {
-			const now = new Date().valueOf();
-			pick = `trade_${now}`;
+		if (props.data.trade_id) {
+			pick = `trade_${props.data.trade_id}`;
 		}
 
+		// console.log("🚀 ~ submitForm ~ pick:", pick);
 		await supabaseData
 			.upsertAnalysis({
 				id: props.data?.id || undefined,
-				draft_class: props.data.draft_class || supabaseData.filteredDraftClass,
+				draft_class: props.data.draft_class || supabaseData.selectedDraftYear,
 				team_id: props.data.team_id || supabaseData.filteredTeam,
 				pick: pick,
 				year: formData.fields.year.value,
@@ -142,7 +144,7 @@ const submitForm = async (formData) => {
 
 const updateData = () => {
 	supabaseData.fetchDraftClassAnalysis(
-		supabaseData.filteredDraftClass,
+		supabaseData.selectedDraftYear,
 		supabaseData.filteredTeam,
 	);
 };
