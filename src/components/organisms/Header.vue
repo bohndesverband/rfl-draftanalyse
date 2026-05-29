@@ -1,45 +1,47 @@
 <template>
-	<div class="uk-container uk-container-large uk-padding">
-		<h1 class="uk-heading-primary">Draftanalyse bearbeiten</h1>
+	<header class="uk-background-default" data-uk-sticky="show-on-up: true">
+		<div class="uk-container uk-container-large uk-padding">
+			<h1 class="uk-heading-primary">Draftanalyse bearbeiten</h1>
 
-		<Button
-			v-if="supabaseData.currentUser"
-			:button="{
-				class: 'uk-position-top-right uk-position-medium',
-				label: 'Logout',
-			}"
-			@click="logout"
-		/>
+			<Button
+				v-if="supabaseData.currentUser"
+				:button="{
+					class: 'uk-position-top-right uk-position-medium',
+					label: 'Logout',
+				}"
+				@click="logout"
+			/>
 
-		<div data-uk-grid>
-			<div class="uk-width-1-3@m">
-				<div class="uk-text-meta uk-text-uppercase uk-margin-small-bottom">
-					RFL Tools
+			<div data-uk-grid>
+				<div class="uk-width-1-3@m">
+					<div class="uk-text-meta uk-text-uppercase uk-margin-small-bottom">
+						RFL Tools
+					</div>
+
+					<div class="uk-button-group">
+						<a
+							class="uk-button uk-button-secondary"
+							href="https://jakesch.shinyapps.io/rfl-tools/#section-draftklassen"
+							target="_blank"
+							>Draftklassen</a
+						>
+						<a
+							class="uk-button uk-button-secondary"
+							href="https://jakesch.shinyapps.io/rfl-tools/#section-draftboards"
+							target="_blank"
+							>Draftboards</a
+						>
+					</div>
 				</div>
 
-				<div class="uk-button-group">
-					<a
-						class="uk-button uk-button-secondary"
-						href="https://jakesch.shinyapps.io/rfl-tools/#section-draftklassen"
-						target="_blank"
-						>Draftklassen</a
-					>
-					<a
-						class="uk-button uk-button-secondary"
-						href="https://jakesch.shinyapps.io/rfl-tools/#section-draftboards"
-						target="_blank"
-						>Draftboards</a
-					>
+				<div class="uk-width-expand@m">
+					<Filter />
 				</div>
 			</div>
 
-			<div class="uk-width-expand@m">
-				<Filter />
-			</div>
+			<hr />
 		</div>
-
-		<hr />
-	</div>
+	</header>
 </template>
 
 <script setup>

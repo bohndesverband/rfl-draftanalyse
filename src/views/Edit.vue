@@ -40,9 +40,9 @@
 		<div v-else class="uk-alert uk-alert-primary">
 			Wähle eine Draftklasse und ein Team aus.
 		</div>
-	</div>
 
-	<a href="" data-uk-totop data-uk-scroll>Nach oben</a>
+		<ToTopButton />
+	</div>
 </template>
 
 <script setup>
@@ -53,6 +53,7 @@
 
 import Header from "@/components/organisms/Header.vue";
 import Analysen from "@/components/organisms/Analysen.vue";
+import ToTopButton from "@/components/atoms/ToTopButton.vue";
 
 import { useSupabaseStore } from "@/store/supabase";
 import { ref, onMounted, watch } from "vue";
