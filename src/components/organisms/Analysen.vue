@@ -172,9 +172,12 @@ const tradeData = computed(() => {
 			const hasMadePick = madePicks.some((pick) => assets.includes(pick));
 
 			return hasYear && !hasMadePick;
+
+			// return trade.trade_id === "2024029";
 			// return hasYear;
 		},
 	);
+	// console.log("🚀 ~ filteredTrades:", filteredTrades);
 
 	return filteredTrades
 		.map((trade) => ({

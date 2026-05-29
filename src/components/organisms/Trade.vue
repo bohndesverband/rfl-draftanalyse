@@ -45,8 +45,11 @@
 						<div v-html="trade.sends"></div>
 						<div v-if="showSearch">
 							<button
+								v-if="!showEditForm"
 								class="uk-button uk-button-secondary"
-								@click="toggleElement(trade.trade_id, $event)"
+								@click="
+									(toggleElement(trade.trade_id, $event), (showEditForm = true))
+								"
 							>
 								<i data-uk-icon="icon: plus"></i>
 							</button>
@@ -60,7 +63,8 @@
 						hidden
 					>
 						<EditForm
-							:data="getEditData(trade.trade_id)"
+							v-if="showEditForm"
+							:data="{ trade_id: trade.trade_id }"
 							@reset="showEditForm = false"
 							@submit="showEditForm = false"
 						/>
@@ -69,6 +73,7 @@
 					<!-- <pre>{{ trade.trade_id }}</pre> -->
 					<div v-if="showSearch" class="trade-table__content uk-padding-small">
 						<slot v-for="tradeAnalysis in ownAnalysis">
+							<!-- <pre>{{ tradeAnalysis }}</pre> -->
 							<Pick
 								v-if="tradeMatchesAnalysis(trade.trade_id, tradeAnalysis.pick)"
 								:data="tradeAnalysis"
@@ -120,6 +125,8 @@ const tradeAnalyses = ref([]);
 const toggleElement = (id, event) => {
 	const element = document.getElementById(id);
 	const trigger = event?.currentTarget;
+
+	showEditForm.value = true;
 
 	if (element) {
 		element.hidden = !element.hidden;
@@ -235,7 +242,7 @@ const getEditData = (tradeID) => {
 				trade_id: tradeID,
 			};
 		})[0];
-	console.log("🚀 ~ getEditData ~ data:", data);
+	// console.log("🚀 ~ getEditData ~ data:", data);
 
 	if (data) return data;
 
