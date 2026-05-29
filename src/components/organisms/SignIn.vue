@@ -5,8 +5,6 @@
 			<AuthentificationForm />
 		</div>
 	</div>
-
-	<SignIn v-if="!supabaseData.currentUser" />
 </template>
 
 <script setup>
@@ -18,7 +16,7 @@
 import AuthentificationForm from "@/components/organisms/forms/AuthentificationForm.vue";
 
 import { useSupabaseStore } from "@/store/supabase";
-import { onMounted } from "vue";
+import { watch } from "vue";
 import { useRouter } from "vue-router";
 
 //
@@ -30,20 +28,18 @@ const supabaseData = useSupabaseStore();
 const router = useRouter();
 
 //
-// onMounted
-//
-// ========================================================================
-
-onMounted(() => {
-	if (supabaseData.currentUser) {
-		router.push("/overview");
-	}
-});
-
-//
 // Functions
 //
 // ========================================================================
+
+watch(
+	() => supabaseData.currentUser,
+	() => {
+		if (supabaseData.currentUser) {
+			router.push("/overview");
+		}
+	},
+);
 </script>
 
 <style lang="scss"></style>

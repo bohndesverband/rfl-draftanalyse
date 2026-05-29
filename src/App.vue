@@ -1,5 +1,6 @@
 <template>
-	<router-view />
+	<SignIn v-if="!supabaseData.currentUser" />
+	<router-view v-else />
 
 	<Alert
 		v-if="supabaseData.alertMessage"
@@ -15,10 +16,12 @@
 //
 // ========================================================================
 
+import SignIn from "@/components/organisms/SignIn.vue";
 import Alert from "@/components/atoms/Alert.vue";
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useSupabaseStore } from "@/store/supabase";
+import { useRouter } from "vue-router";
 
 //
 // Constants
@@ -27,6 +30,7 @@ import { useSupabaseStore } from "@/store/supabase";
 
 const supabaseData = useSupabaseStore();
 const trades = ref([]);
+const router = useRouter();
 
 //
 // Functions
@@ -38,4 +42,13 @@ onMounted(async () => {
 	await supabaseData.fetchRflTeams();
 	await supabaseData.fetchRflDrafts();
 });
+
+watch(
+	() => supabaseData.currentUser,
+	() => {
+		if (!supabaseData.currentUser) {
+			router.push("/signin");
+		}
+	},
+);
 </script>
